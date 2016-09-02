@@ -1,0 +1,19 @@
+{
+  "name": "webly-soccer",
+  "version": "0.0.1",
+  "description": "a soccer game",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "author": "stagas",
+  "license": "MIT",
+  "dependencies": {
+    "pixel-art": "^1.1.0"
+  },
+  "devDependencies": {
+    "css-modulesify": "^0.25.1",
+    "live-server": "^1.1.0",
+    "watchify": "^3.7.0"
+  }
+}
