@@ -8,12 +8,12 @@ var k = arrows(document.body);
 var player = createSprite('player');
 
 player.speed = 14;
-player.face = 'rotate';
+player.face = 'stand_down';
 player.faceDuration = 5;
 player.faceIndex = 0;
 player.faceNeedle = 0;
 player.faceMap = {
-  '0,0': 'rotate',
+  '0,0': 'stand_down',
   '-1,0': 'run_left',
   '0,-1': 'run_up',
   '1,0': 'run_right',
@@ -22,6 +22,17 @@ player.faceMap = {
   '1,-1': 'run_up_right',
   '-1,1': 'run_down_left',
   '1,1': 'run_down_right',
+};
+player.faceStandMap = {
+  '0,0': 'stand_down',
+  '-1,0': 'stand_left',
+  '0,-1': 'stand_up',
+  '1,0': 'stand_right',
+  '0,1': 'stand_down',
+  '-1,-1': 'stand_up_left',
+  '1,-1': 'stand_up_right',
+  '-1,1': 'stand_down_left',
+  '1,1': 'stand_down_right',
 };
 
 player.move = function(x, y){
@@ -37,20 +48,18 @@ player.update = function() {
 };
 
 player.render = function(dt, alpha) {
-  var i = player.faceIndex;
-  var n = player.faceNeedle;
-
   player.px.x += (player.pos.x - player.px.x) * alpha;
   player.px.y += (player.pos.y - player.px.y) * alpha;
 
+  var i = player.faceIndex;
+  var n = player.faceNeedle;
+  n %= sprite.player.animation[player.face].length;
+
   var index = sprite.player.animation[player.face][n];
-  var x = index * sprite.player.width * sprite.scale;
-  var y = ~sprite.player.animation[player.face].mirror_x.indexOf(n)
-    ? sprite.player.height * sprite.scale : 0;
+  var x = index[0] * sprite.player.width * sprite.scale;
+  var y = index[1] ? sprite.player.height * sprite.scale : 0;
   player.faceIndex = (i + 1) % player.faceDuration;
-  if (player.faceIndex === 0) {
-    player.faceNeedle = (n + 1) % sprite.player.animation[player.face].length;
-  }
+  if (player.faceIndex === 0) player.faceNeedle = n + 1;
 
   Object.assign(player.el.style, {
     left: Math.round(player.px.x) + 'px',
@@ -88,6 +97,8 @@ function controls() {
   k & k.right && player.move(1,0);
   k & k.down  && player.move(0,1);
   player.face = player.faceMap[player.vel];
+  player.faceStandMap['0,0'] =
+  player.faceMap['0,0'] = player.faceStandMap[player.vel];
 }
 
 /* utils */

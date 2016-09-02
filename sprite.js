@@ -367,25 +367,26 @@ sprite.player = [
 `,
 ];
 
-sprite.player.animation = {};
-sprite.player.animation.rotate = [0,1,2,3,4,3,2,1];
-sprite.player.animation.rotate.mirror_x = [5,6,7];
-sprite.player.animation.run_right = [7,6,5,2];
-sprite.player.animation.run_right.mirror_x = [];
-sprite.player.animation.run_left = [7,6,5,2];
-sprite.player.animation.run_left.mirror_x = [0,1,2,3];
-sprite.player.animation.run_down = [8,9,8,9];
-sprite.player.animation.run_down.mirror_x = [3];
-sprite.player.animation.run_up = [16,17,16,17];
-sprite.player.animation.run_up.mirror_x = [3];
-sprite.player.animation.run_down_right = [11,12,10,1];
-sprite.player.animation.run_down_right.mirror_x = [];
-sprite.player.animation.run_up_right = [13,14,15,3];
-sprite.player.animation.run_up_right.mirror_x = [];
-sprite.player.animation.run_down_left = [11,12,10,1];
-sprite.player.animation.run_down_left.mirror_x = [0,1,2,3];
-sprite.player.animation.run_up_left = [13,14,15,3];
-sprite.player.animation.run_up_left.mirror_x = [0,1,2,3];
+sprite.player.animation = {
+  stand_down: [[0]],
+  stand_down_right: [[1]],
+  stand_right: [[2]],
+  stand_up_right: [[3]],
+  stand_up: [[4]],
+  stand_up_left: [[3,true]],
+  stand_left: [[2,true]],
+  stand_down_left: [[1,true]],
+
+  run_right: [[7],[6],[5],[2]],
+  run_left: [[7,true],[6,true],[5,true],[2,true]],
+  run_down: [[8],[9],[8,true],[9]],
+  run_up: [[16],[17],[16,true],[17]],
+  run_down_right: [[11],[12],[10],[1]],
+  run_up_right: [[13],[14],[15],[3]],
+  run_down_left: [[11,true],[12,true],[10,true],[1,true]],
+  run_up_left: [[13,true],[14,true],[15,true],[3,true]],
+};
+
 sprite.player.palette = {
   'x': '#000',
   'v': '#444',
