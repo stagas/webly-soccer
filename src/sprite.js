@@ -1,5 +1,10 @@
+var pixel = require('pixel-art');
+var merge = require('../lib/merge');
+var Point = require('../lib/point');
 
 var sprite = exports;
+
+sprite.scale = 3;
 
 // ball
 
@@ -400,4 +405,56 @@ sprite.player.palette = {
 
 sprite.player.width = 11;
 sprite.player.height = 14;
-sprite.scale = 3;
+sprite.player.scale = sprite.scale;
+
+sprite.create = function createSprite(name) {
+  var canvas = document.createElement('canvas');
+  var context = canvas.getContext('2d');
+  var s = sprite[name];
+
+  canvas.width = s.length * s.width * s.scale;
+  canvas.height = s.height * s.scale * 2;
+
+  s
+    // normal
+    .map((art, index) => {
+      pixel.art(art)
+      .palette(s.palette)
+      .scale(s.scale).pos({
+        x: s.width * s.scale * index,
+        y: 0
+      })
+      .draw(context);
+      return art;
+    })
+
+    // mirror x
+    .map((art, index) => {
+      art = art.split('\n').map(row => padRight(row, s.width).split('').reverse().join(''));
+      pixel.art(art)
+      .palette(s.palette)
+      .scale(s.scale).pos({
+        x: s.width * s.scale * index,
+        y: s.height * s.scale
+      })
+      .draw(context);
+      return art;
+    });
+
+  var dataURL = canvas.toDataURL();
+  var div = document.createElement('div');
+  div.style.position = 'absolute';
+  div.style.background = `url(${dataURL}) 0 0 no-repeat`;
+  div.style.width = s.scale * s.width + 'px';
+  div.style.height = s.scale * s.height + 'px';
+  return merge({
+    el: div,
+    px: new Point,
+    pos: new Point,
+    vel: new Point,
+  }, s);
+};
+
+function padRight(s, n) {
+  return s + new Array(n - s.length + 1).join(' ');
+}
