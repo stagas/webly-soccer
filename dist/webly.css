@@ -1,0 +1,133 @@
+
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-color: #080;
+  width: 2300px;
+  height: 1200px;
+  overflow: hidden;
+}
+
+._style__stadium {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+._style__pitch {
+  overflow: hidden;
+  position: absolute;
+  left: 50px;
+  top: 50px;
+  width: 2200px;
+  height: 1100px;
+  border: 3px solid #fff;
+}
+
+._style__halfway-line {
+  position: absolute;
+  left: 50%;
+  height: 100%;
+  width: 3px;
+  background: #fff;
+}
+
+._style__center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+._style__center-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -9px;
+  margin-top: -9px;
+}
+
+._style__penalty-arc-left {
+  position: absolute;
+  top: 50%;
+  left: 200px;
+}
+._style__penalty-spot-left {
+  position: absolute;
+  top: 50%;
+  left: 200px;
+  margin-left: -9px;
+  margin-top: -9px;
+}
+
+._style__penalty-arc-right {
+  position: absolute;
+  top: 50%;
+  right: 200px;
+}
+._style__penalty-spot-right {
+  position: absolute;
+  top: 50%;
+  right: 200px;
+  margin-right: -9px;
+  margin-top: -9px;
+}
+
+._style__penalty-area-left {
+  position: absolute;
+  top: 247px;
+  width: 300px;
+  height: 600px;
+  border: 3px solid #fff;
+  border-left: none;
+}
+
+._style__goal-area-left {
+  position: absolute;
+  top: 394px;
+  width: 100px;
+  height: 306px;
+  border: 3px solid #fff;
+  border-left: none;
+}
+
+._style__penalty-area-right {
+  position: absolute;
+  top: 247px;
+  right: 0;
+  width: 300px;
+  height: 600px;
+  border: 3px solid #fff;
+  border-right: none;
+}
+
+._style__goal-area-right {
+  position: absolute;
+  top: 394px;
+  right: 0;
+  width: 100px;
+  height: 306px;
+  border: 3px solid #fff;
+  border-right: none;
+}
+
+._style__corner-arc-bottom-left {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+._style__corner-arc-top-right {
+  position: absolute;
+  right: 0;
+}
+
+._style__corner-arc-bottom-right {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
