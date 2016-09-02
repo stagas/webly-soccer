@@ -379,8 +379,8 @@ sprite.player.animation = {
 
   run_right: [[7],[6],[5],[2]],
   run_left: [[7,true],[6,true],[5,true],[2,true]],
-  run_down: [[8],[9],[8,true],[9]],
-  run_up: [[16],[17],[16,true],[17]],
+  run_down: [[8],[9],[8],[9,true]],
+  run_up: [[16],[17],[16],[17,true]],
   run_down_right: [[11],[12],[10],[1]],
   run_up_right: [[13],[14],[15],[3]],
   run_down_left: [[11,true],[12,true],[10,true],[1,true]],
