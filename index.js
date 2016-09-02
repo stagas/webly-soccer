@@ -7,9 +7,9 @@ var k = arrows(document.body);
 
 var player = createSprite('player');
 
-player.speed = 14;
+player.speed = 19;
 player.face = 'stand_down';
-player.faceDuration = 5;
+player.faceDuration = 4;
 player.faceIndex = 0;
 player.faceNeedle = 0;
 player.faceMap = {
@@ -41,8 +41,10 @@ player.move = function(x, y){
 };
 
 player.update = function() {
-  player.pos.x += player.vel.x * player.speed;
-  player.pos.y += player.vel.y * player.speed;
+  var speed = player.speed;
+  if (player.vel.x && player.vel.y) speed *= 0.75;
+  player.pos.x += player.vel.x * speed;
+  player.pos.y += player.vel.y * speed;
   player.vel.x = 0;
   player.vel.y = 0;
 };
