@@ -1,10 +1,14 @@
+require('./style.css');
 var Loop = require('./lib/loop');
 var arrows = require('./lib/arrows');
+var Stadium = require('./src/stadium');
 var Player = require('./src/player');
 
 var k = arrows(document.body);
 
+var stadium = new Stadium;
 var player = new Player;
+document.body.appendChild(stadium.el);
 document.body.appendChild(player.el);
 
 /* loop */

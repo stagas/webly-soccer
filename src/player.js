@@ -47,8 +47,8 @@ Player.prototype.update = function() {
   var speed = this.speed;
   if (this.vel.x && this.vel.y) speed *= 0.75;
 
-  this.pos.x += this.vel.x * speed;
-  this.pos.y += this.vel.y * speed;
+  this.pos.x += this.vel.x * speed | 0;
+  this.pos.y += this.vel.y * speed | 0;
   this.vel.x = 0;
   this.vel.y = 0;
 };
@@ -63,13 +63,13 @@ Player.prototype.render = function(dt, alpha) {
 
   var index = this.animation[this.face][n];
   var x = index[0] * this.width * this.scale;
-  var y = index[1] ? this.height * this.scale : 0;
+  var y = index[1] ? this.height * this.scale + this.scale : 0;
   this.faceIndex = (i + 1) % this.faceDuration;
   if (this.faceIndex === 0) this.faceNeedle = n + 1;
 
   Object.assign(this.el.style, {
-    left: Math.round(this.px.x) + 'px',
-    top: Math.round(this.px.y) + 'px',
+    left: this.px.x + 'px',
+    top: this.px.y + 'px',
     backgroundPosition: `-${x}px -${y}px`,
   });
 };

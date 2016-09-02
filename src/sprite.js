@@ -407,13 +407,30 @@ sprite.player.width = 11;
 sprite.player.height = 14;
 sprite.player.scale = sprite.scale;
 
+sprite.center_spot = [`\
+
+  xox
+ xooox
+ xooox
+  xox
+\
+`]
+
+sprite.center_spot.palette = {
+  'o': '#fff',
+  'x': 'rgba(255,255,255,.5)'
+};
+sprite.center_spot.width = 7;
+sprite.center_spot.height = 6;
+sprite.center_spot.scale = sprite.scale;
+
 sprite.create = function createSprite(name) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
   var s = sprite[name];
 
   canvas.width = s.length * s.width * s.scale;
-  canvas.height = s.height * s.scale * 2;
+  canvas.height = s.scale * 2 + s.height * s.scale * 2;
 
   s
     // normal
@@ -430,12 +447,13 @@ sprite.create = function createSprite(name) {
 
     // mirror x
     .map((art, index) => {
-      art = art.split('\n').map(row => padRight(row, s.width).split('').reverse().join(''));
+      if ('string' === typeof art) art = art.split('\n');
+      art = art.map(row => padRight(row, s.width).split('').reverse().join(''));
       pixel.art(art)
       .palette(s.palette)
       .scale(s.scale).pos({
         x: s.width * s.scale * index,
-        y: s.height * s.scale
+        y: s.height * s.scale + s.scale
       })
       .draw(context);
       return art;
@@ -456,5 +474,6 @@ sprite.create = function createSprite(name) {
 };
 
 function padRight(s, n) {
+  n = Math.max(n, s.length - 1);
   return s + new Array(n - s.length + 1).join(' ');
 }
