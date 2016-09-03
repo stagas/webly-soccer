@@ -26,6 +26,7 @@ body {
   width: 2154px;
   height: 1100px;
   border: 3px solid #fff;
+  opacity: 0.87;
 }
 
 ._style__halfway-line {
@@ -134,14 +135,14 @@ body {
 ._style__goal-nets-left {
   position: absolute;
   top: 50%;
-  left: 300px;
+  left: 189px;
   z-index: 5;
 }
 
 ._style__goal-nets-right {
   position: absolute;
   top: 50%;
-  right: 300px;
+  right: 183px;
   z-index: 5;
 }
 
@@ -159,6 +160,7 @@ body {
   width: 3px;
   height: 6px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-top-left:after {
@@ -169,6 +171,7 @@ body {
   width: 6px;
   height: 3px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-bottom-left {
@@ -185,6 +188,7 @@ body {
   width: 3px;
   height: 6px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-bottom-left:after {
@@ -195,6 +199,7 @@ body {
   width: 6px;
   height: 3px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-top-right {
@@ -211,6 +216,7 @@ body {
   width: 3px;
   height: 6px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-top-right:after {
@@ -221,6 +227,7 @@ body {
   width: 6px;
   height: 3px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-bottom-right {
@@ -237,6 +244,7 @@ body {
   width: 3px;
   height: 6px;
   background: #fff;
+  opacity: 0.87;
 }
 
 ._style__corner-flag-bottom-right:after {
@@ -247,4 +255,5 @@ body {
   width: 6px;
   height: 3px;
   background: #fff;
+  opacity: 0.87;
 }
