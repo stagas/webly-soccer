@@ -4,8 +4,8 @@ module.exports = Camera;
 
 function Camera(leader) {
   this.leader = leader;
-  this.speed = 0.13;
-  this.friction = 0.49;
+  this.speed = 0.14;
+  this.friction = 0.55;
   this.px = new Point;
   this.pos = new Point;
   this.vel = new Point;
@@ -22,6 +22,9 @@ Camera.prototype.onresize = function() {
 Camera.prototype.update = function() {
   var dx = (this.leader.pos.x + this.leader.width * this.leader.scale / 2 - this.size.x / 2) - this.pos.x;
   var dy = (this.leader.pos.y + this.leader.height * this.leader.scale / 2 - this.size.y / 2) - this.pos.y;
+
+  if (Math.abs(dx) < 1) dx = 0;
+  if (Math.abs(dy) < 1) dy = 0;
 
   this.vel.x += dx * this.speed;
   this.vel.y += dy * this.speed;
