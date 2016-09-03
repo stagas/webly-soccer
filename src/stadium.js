@@ -147,7 +147,13 @@ function createGrass() {
   context.fillStyle = '#080';
   context.fillRect(canvas.width/2,0,canvas.width/2,canvas.height);
   for (var i = 2500; i--;) {
-    context.fillStyle = 'rgba(0,0,0,0.03)';
+    context.fillStyle = 'rgba(0,0,0,0.035)';
+    var x = Math.random() * canvas.width | 0;
+    var y = Math.random() * canvas.height | 0;
+    context.fillRect(x,y,1,1);
+  }
+  for (var i = 500; i--;) {
+    context.fillStyle = 'rgba(0,255,0,0.05)';
     var x = Math.random() * canvas.width | 0;
     var y = Math.random() * canvas.height | 0;
     context.fillRect(x,y,1,1);
