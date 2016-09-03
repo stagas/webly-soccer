@@ -386,6 +386,30 @@ sprite.player = [
 `,
 ];
 
+sprite.player.shadow = function makeShadow(art) {
+  if ('string' === typeof art) art = art.split('\n');
+  art = art.slice();
+  var flipped = art.slice().reverse();
+  var regexp = /[^ ]/g;
+  var size = 0;
+  var skewX = 1;
+  var skewY = 1.3;
+  var shortX = 0;
+  var width = 0;
+  for (var i = 0; i < flipped.length; i += skewY) {
+    size++;
+    skewY += 1.2;
+    skewX += 1;
+    shortX += 0.52;
+    if (shortX > 1.5) regexp = /[^ ]{1,2}/g;
+    if (shortX > 2.5) regexp = /[^ ]{1,3}/g;
+    var row = new Array(skewX | 0).join(' ') + flipped[i | 0].replace(regexp, () => '%');
+    width = row.length;
+    art.push(row);
+  }
+  return art;
+};
+
 sprite.player.animation = {
   stand_down: [[0]],
   stand_down_right: [[1]],
@@ -440,67 +464,93 @@ sprite.center_spot.scale = sprite.scale;
 
 sprite.goal_nets = [
 `\
-      ;xxxxxxxxxxxxxx
-     ;vx;x;x;x/x/x/xx
-     v;xx;x/x/x/x/x/x
-    ;v;x/x/x/x/x/x/xx
-    vv/xx/x/x/x/x/x/x
-   ;v;vx/x/x/x/x/x/xx
-   v;v/xx/x/x/x/x/x/x
-  ;vv/vx/x/x/x/x/x/xx
-  vv;v;xx/x/x/x/x;x;x
-  v;v;vx;x;x;x;x;x;xx
-  vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v;xx.x.x.x.x.x.x
- 3v;v;vx.x.x.x.x.x.xx
- 3vv.v;xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v;vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv;v.xx.x.x.x.x.x.x
- 3v;v.vx.x.x.x.x.x.xx
- 3vv.v.xx.x.x.x.x.x.x
- 3v.v.vx.x.x.x.x.x.xx
- 3vv.v;xxxxxxxxxxxxxx
- 3v.v.xx;x;x.x.x.x.xx
- 3vv.xx;x.x.x.x.x.x.x
- 3v;xx;x.x.x.x.x.x.xx
- 3vx;xx.x.x.x.x.x.x;x
- 3v;xx.x.x.x.x.x.x;xx
- 3vxx;x.x.x.x.x.x.x;x
- 3vxxx.x.x.x.x.x.x;xx
- 3vxx;x.x.x.x;x.x;x;x
- 3xxxxxxxxxxxxxxxxxxx
- 33333333888888888888
-   333333333338888888
-       33333333333333\
+    ;xxxxxxxxxxxxxx
+   ;vx;x;x;x/x/x/xx
+   v;xx;x/x/x/x/x/x
+  ;v;x/x/x/x/x/x/xx
+  vv/xx/x/x/x/x/x/x
+ ;v;vx/x/x/x/x/x/xx
+ v;v/xx/x/x/x/x/x/x
+;vv/vx/x/x/x/x/x/xx
+vv;v;xx/x/x/x/x;x;x
+v;v;vx;x;x;x;x;x;xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v;xx.x.x.x.x.x.x
+v;v;vx.x.x.x.x.x.xx
+vv.v;xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v;vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv;v.xx.x.x.x.x.x.x
+v;v.vx.x.x.x.x.x.xx
+vv.v.xx.x.x.x.x.x.x
+v.v.vx.x.x.x.x.x.xx
+vv.v;xxxxxxxxxxxxxx
+v.v.xx;x;x.x.x.x.xx
+vv.xx;x.x.x.x.x.x.x
+v;xx;x.x.x.x.x.x.xx
+vx;xx.x.x.x.x.x.x;x
+v;xx.x.x.x.x.x.x;xx
+vxx;x.x.x.x.x.x.x;x
+vxxx.x.x.x.x.x.x;xx
+vxx;x.x.x.x;x.x;x;x
+xxxxxxxxxxxxxxxxxxx\
 `,
 ];
+
+sprite.goal_nets.shadow = function makeShadow(art) {
+  if ('string' === typeof art) art = art.split('\n');
+  art = art.slice();
+  for (var i = 0; i < art.length; i++) {
+    art[i] = art[i].trimRight();
+  }
+  var f = true;
+  art[10] += '%'
+  art[11] += ' %'
+  art[12] += '% %'
+  art[13] += ' % %'
+  art[14] += '% % %'
+  for (var i = 15; i < art.length; i++) {
+    art[i] += (f ? ' ' : '') + '% % %' + (f ? '' : '%');
+    f = !f;
+  }
+  var width = 24;
+  var line = [];
+  for (var i = 0; i < width; i++) {
+    line[i] = f ? '%' : ' ';
+    f = !f;
+  }
+  for (var i = 0; i < 3; i++) {
+    art.push(new Array(20 + i).join(' ') + line.slice(0, line.length - i).join('') + '%');
+  }
+  art.push(new Array(20 + i + 1).join(' ') + '%%%%%%%%%%%%%%%%%%%%%')
+  return art;
+};
 
 sprite.goal_nets.palette = {
   'x': '#fff',
@@ -512,7 +562,9 @@ sprite.goal_nets.palette = {
   '8': 'rgba(0,0,0,.25)',
 };
 sprite.goal_nets.width = sprite.goal_nets[0].split('\n')[0].length;
-sprite.goal_nets.height = sprite.goal_nets[0].split('\n').length + 5;
+sprite.goal_nets.height = sprite.goal_nets[0].split('\n').length;
+sprite.goal_nets.left = sprite.goal_nets.width;
+sprite.goal_nets.top = (sprite.goal_nets.height / 2 | 0) + 3;
 sprite.goal_nets.scale = sprite.scale;
 
 sprite.corner_flag = [`\
@@ -540,20 +592,23 @@ sprite.corner_flag.width = 5;
 sprite.corner_flag.height = sprite.corner_flag[0].split('\n').length - 1;
 sprite.corner_flag.scale = sprite.scale;
 
-sprite.create = function createSprite(name, withShadow) {
+sprite.create = function createSprite(name) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
   var s = sprite[name];
 
-  if (withShadow) {
+  if (s.shadow) {
     s.palette['%'] = 'rgba(0,0,0,.25)';
     var padded = s
       .map(art => 'string' === typeof art ? art.split('\n') : art)
       .map(art => art.map(row => new Array(s.width + 1).join(' ') + row));
 
     padded.animation = s.animation;
-    padded.width = s.width *= 3;
-    padded.height = s.height *= 2;
+    padded.shadow = s.shadow;
+    padded.width = s.width * 3;
+    padded.height = s.height * 2;
+    padded.left = s.left + s.width / 3 | 0;
+    padded.top = s.top;
     padded.palette = s.palette;
     padded.scale = s.scale;
     s = padded;
@@ -564,7 +619,7 @@ sprite.create = function createSprite(name, withShadow) {
 
   // normal
   s.forEach((art, index) => {
-    if (withShadow) art = makeShadow(art);
+    if (s.shadow) art = s.shadow(art);
     pixel.art(art)
     .palette(s.palette)
     .scale(s.scale).pos({
@@ -578,7 +633,7 @@ sprite.create = function createSprite(name, withShadow) {
   s.forEach((art, index) => {
     if ('string' === typeof art) art = art.split('\n');
     art = art.map(row => padRight(row, s.width).split('').reverse().join(''));
-    if (withShadow) art = makeShadow(art);
+    if (s.shadow) art = s.shadow(art);
     pixel.art(art)
     .palette(s.palette)
     .scale(s.scale).pos({
@@ -594,6 +649,7 @@ sprite.create = function createSprite(name, withShadow) {
   div.style.background = `url(${dataURL}) 0 0 no-repeat`;
   div.style.width = s.scale * s.width + 'px';
   div.style.height = s.scale * s.height + 'px';
+  if (s.top) div.style.marginTop = -(s.scale * s.top) + 'px';
   return merge({
     el: div,
     px: new Point,
@@ -605,28 +661,4 @@ sprite.create = function createSprite(name, withShadow) {
 function padRight(s, n) {
   n = Math.max(n, s.length - 1);
   return s + new Array(n - s.length + 1).join(' ');
-}
-
-function makeShadow(art) {
-  if ('string' === typeof art) art = art.split('\n');
-  art = art.slice();
-  var flipped = art.slice().reverse();
-  var regexp = /[^ ]/g;
-  var size = 0;
-  var skewX = 1;
-  var skewY = 1.3;
-  var shortX = 0;
-  var width = 0;
-  for (var i = 0; i < flipped.length; i += skewY) {
-    size++;
-    skewY += 1.2;
-    skewX += 1;
-    shortX += 0.52;
-    if (shortX > 1.5) regexp = /[^ ]{1,2}/g;
-    if (shortX > 2.5) regexp = /[^ ]{1,3}/g;
-    var row = new Array(skewX | 0).join(' ') + flipped[i | 0].replace(regexp, () => '%');
-    width = row.length;
-    art.push(row);
-  }
-  return art;
 }

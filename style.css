@@ -135,14 +135,14 @@ body {
 .goal-nets-left {
   position: absolute;
   top: 50%;
-  left: 300px;
+  left: 189px;
   z-index: 5;
 }
 
 .goal-nets-right {
   position: absolute;
   top: 50%;
-  right: 300px;
+  right: 183px;
   z-index: 5;
 }
 
