@@ -7,6 +7,9 @@ function Stadium() {
   this.el = document.createElement('div');
   this.el.className = css.stadium;
 
+  var grass = createGrass();
+  this.el.style.background = 'url(' + grass.toDataURL() + ') -60px 0px';
+
   this.pitch = document.createElement('div');
   this.pitch.className = css.pitch;
   this.el.appendChild(this.pitch);
@@ -134,31 +137,31 @@ function createCenterCircle(side, a, b, c) {
   return second;
 }
 
-function createPenaltyArc(side, a, b, c) {
+function createGrass() {
   var canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 8;
+  canvas.height = 60;
+  canvas.width = canvas.height * 2;
   var context = canvas.getContext('2d');
-  var centerX = canvas.width / 2;
-  var centerY = canvas.height / 2;
-  var radius = canvas.width / 2.4;
-
-  context.imageSmoothingEnabled = false;
-
-  context.beginPath();
-  context.arc(centerX, centerY, radius, a || 0, b || (2 * Math.PI), true);
-  context.lineWidth = 1;
-  context.strokeStyle = '#fff';
-  context.stroke();
+  context.fillStyle = '#090';
+  context.fillRect(0,0,canvas.width/2,canvas.height);
+  context.fillStyle = '#080';
+  context.fillRect(canvas.width/2,0,canvas.width/2,canvas.height);
+  for (var i = 2500; i--;) {
+    context.fillStyle = 'rgba(0,0,0,0.03)';
+    var x = Math.random() * canvas.width | 0;
+    var y = Math.random() * canvas.height | 0;
+    context.fillRect(x,y,1,1);
+  }
 
   var png = document.createElement('img');
   png.src = canvas.toDataURL('image/png');
 
   var second = document.createElement('canvas');
-  second.width = second.height = canvas.width * 3;
-  second.style['margin' + (side || 'Left')] = -(canvas.width * 3 / 2) + 'px';
-  second.style.marginTop = -(canvas.width * 3 / 2) + 'px';
+  second.width = canvas.width * 3;
+  second.height = canvas.height * 3;
   var ctx = second.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(png, 0, 0, canvas.width * 3, canvas.height * 3);
+
   return second;
 }

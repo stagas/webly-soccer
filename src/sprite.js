@@ -526,7 +526,6 @@ sprite.corner_flag.width = 5;
 sprite.corner_flag.height = sprite.corner_flag[0].split('\n').length - 1;
 sprite.corner_flag.scale = sprite.scale;
 
-
 sprite.create = function createSprite(name) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
