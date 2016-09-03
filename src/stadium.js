@@ -70,6 +70,19 @@ function Stadium() {
   this.cornerArcBottomRight = createCenterCircle({ x: 'Right', y: 'Bottom' }, 0, 2 * Math.PI, 24);
   this.cornerArcBottomRight.className = css['corner-arc-bottom-right'];
   this.pitch.appendChild(this.cornerArcBottomRight);
+
+  this.goalNetsLeft = sprite.create('goal_nets');
+  this.goalNetsLeft.el.className = css['goal-nets-left'];
+  this.el.appendChild(this.goalNetsLeft.el);
+  this.goalNetsLeft.el.style.marginTop = -(this.goalNetsLeft.height * this.goalNetsLeft.scale / 2) + 'px';
+  this.goalNetsLeft.el.style.marginLeft = -((this.goalNetsLeft.width - 1) * this.goalNetsLeft.scale) + 'px';
+
+  this.goalNetsRight = sprite.create('goal_nets');
+  this.goalNetsRight.el.className = css['goal-nets-right'];
+  this.el.appendChild(this.goalNetsRight.el);
+  this.goalNetsRight.el.style.backgroundPosition = '0 ' + (-(this.goalNetsRight.height * this.goalNetsRight.scale + 3)) + 'px';
+  this.goalNetsRight.el.style.marginTop = -(this.goalNetsRight.height * this.goalNetsRight.scale / 2) + 'px';
+  this.goalNetsRight.el.style.marginRight = -((this.goalNetsRight.width + 1) * this.goalNetsRight.scale) + 'px';
 }
 
 function createCenterCircle(side, a, b, c) {

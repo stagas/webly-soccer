@@ -424,6 +424,83 @@ sprite.center_spot.width = 7;
 sprite.center_spot.height = 6;
 sprite.center_spot.scale = sprite.scale;
 
+sprite.goal_nets = [
+`\
+      ;xxxxxxxxxxxxxx
+     ;vx;x;x;x/x/x/xx
+     v;xx;x/x/x/x/x/x
+    ;v;x/x/x/x/x/x/xx
+    vv/xx/x/x/x/x/x/x
+   ;v;vx/x/x/x/x/x/xx
+   v;v/xx/x/x/x/x/x/x
+  ;vv/vx/x/x/x/x/x/xx
+  vv;v;xx/x/x/x/x;x;x
+  v;v;vx;x;x;x;x;x;xx
+  vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v;xx.x.x.x.x.x.x
+ 3v;v;vx.x.x.x.x.x.xx
+ 3vv.v;xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v;vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv;v.xx.x.x.x.x.x.x
+ 3v;v.vx.x.x.x.x.x.xx
+ 3vv.v.xx.x.x.x.x.x.x
+ 3v.v.vx.x.x.x.x.x.xx
+ 3vv.v;xxxxxxxxxxxxxx
+ 3v.v.xx;x;x.x.x.x.xx
+ 3vv.xx;x.x.x.x.x.x.x
+ 3v;xx;x.x.x.x.x.x.xx
+ 3vx;xx.x.x.x.x.x.x;x
+ 3v;xx.x.x.x.x.x.x;xx
+ 3vxx;x.x.x.x.x.x.x;x
+ 3vxxx.x.x.x.x.x.x;xx
+ 3vxx;x.x.x.x;x.x;x;x
+ 3xxxxxxxxxxxxxxxxxxx
+ 33333333888888888888
+   333333333338888888
+       33333333333333\
+`,
+];
+
+sprite.goal_nets.palette = {
+  'x': '#fff',
+  'v': '#ddd',
+  ';': 'rgba(200,200,200,.6)',
+  '.': 'rgba(150,150,150,.5)',
+  '/': 'rgba(180,180,180,.6)',
+  '3': 'rgba(0,0,0,.2)',
+  '8': 'rgba(0,0,0,.3)',
+};
+sprite.goal_nets.width = sprite.goal_nets[0].split('\n')[0].length;
+sprite.goal_nets.height = sprite.goal_nets[0].split('\n').length + 5;
+sprite.goal_nets.scale = sprite.scale;
+
 sprite.create = function createSprite(name) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
