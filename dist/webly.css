@@ -8,8 +8,6 @@ html, body {
 
 body {
   background-color: #080;
-  width: 2300px;
-  height: 1200px;
   overflow: hidden;
 }
 
@@ -17,13 +15,15 @@ body {
   position: absolute;
   left: 0;
   top: 0;
+  width: 2800px;
+  height: 1700px;
 }
 
 ._style__pitch {
   overflow: hidden;
   position: absolute;
-  left: 50px;
-  top: 50px;
+  left: 300px;
+  top: 300px;
   width: 2200px;
   height: 1100px;
   border: 3px solid #fff;
@@ -130,4 +130,42 @@ body {
   position: absolute;
   right: 0;
   bottom: 0;
+}
+
+._style__goal-nets-left {
+  position: absolute;
+  top: 50%;
+  left: 300px;
+  z-index: 5;
+}
+
+._style__goal-nets-right {
+  position: absolute;
+  top: 50%;
+  right: 300px;
+  z-index: 5;
+}
+
+._style__corner-flag-top-left {
+  position: absolute;
+  top: 312px;
+  left: 300px;
+}
+
+._style__corner-flag-bottom-left {
+  position: absolute;
+  bottom: 285px;
+  left: 300px;
+}
+
+._style__corner-flag-top-right {
+  position: absolute;
+  top: 312px;
+  right: 282px;
+}
+
+._style__corner-flag-bottom-right {
+  position: absolute;
+  bottom: 285px;
+  right: 282px;
 }
