@@ -502,19 +502,25 @@ sprite.goal_nets.height = sprite.goal_nets[0].split('\n').length + 5;
 sprite.goal_nets.scale = sprite.scale;
 
 sprite.corner_flag = [`\
-gg
-gggg
-ggggg
+gb
+ggb
+gggb
 x
 x
 x
 x
+777
+  77
+
 \
 `]
 
 sprite.corner_flag.palette = {
   'x': '#ccc',
-  'g': '#f00'
+  'g': '#f00',
+  'b': '#c20',
+  ';': 'rgba(255,255,255,.1)',
+  '7': 'rgba(0,0,0,.3)',
 };
 sprite.corner_flag.width = 5;
 sprite.corner_flag.height = sprite.corner_flag[0].split('\n').length - 1;

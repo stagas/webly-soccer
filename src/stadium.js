@@ -87,7 +87,7 @@ function Stadium() {
   this.cornerFlagTopLeft = sprite.create('corner_flag');
   this.cornerFlagTopLeft.el.className = css['corner-flag-top-left'];
   this.el.appendChild(this.cornerFlagTopLeft.el);
-  this.cornerFlagTopLeft.el.style.marginTop = -((this.cornerFlagTopLeft.height - 1) * this.cornerFlagTopLeft.scale) + 'px';
+  this.cornerFlagTopLeft.el.style.marginTop = -((this.cornerFlagTopLeft.height) * this.cornerFlagTopLeft.scale) + 'px';
 
   this.cornerFlagBottomLeft = sprite.create('corner_flag');
   this.cornerFlagBottomLeft.el.className = css['corner-flag-bottom-left'];
@@ -97,7 +97,7 @@ function Stadium() {
   this.cornerFlagTopRight = sprite.create('corner_flag');
   this.cornerFlagTopRight.el.className = css['corner-flag-top-right'];
   this.el.appendChild(this.cornerFlagTopRight.el);
-  this.cornerFlagTopRight.el.style.marginTop = -((this.cornerFlagTopRight.height - 1) * this.cornerFlagTopRight.scale) + 'px';
+  this.cornerFlagTopRight.el.style.marginTop = -((this.cornerFlagTopRight.height) * this.cornerFlagTopRight.scale) + 'px';
 
   this.cornerFlagBottomRight = sprite.create('corner_flag');
   this.cornerFlagBottomRight.el.className = css['corner-flag-bottom-right'];
