@@ -13,8 +13,9 @@ var camera = new Camera(player);
 document.body.appendChild(stadium.el);
 document.body.appendChild(player.el);
 // player.pos.x = player.px.x = 2300 / 2 - player.width * player.scale / 2;
-player.pos.y = player.px.y = 1700 / 2 - player.height * player.scale;
-player.pos.x = player.px.x = 2080;
+// player.pos.y = player.px.y = 1700 / 2 - player.height * player.scale;
+player.pos.y = player.px.y = 480;
+player.pos.x = player.px.x = 2200;
 /* loop */
 
 var loop = new Loop;

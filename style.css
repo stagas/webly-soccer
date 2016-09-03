@@ -145,3 +145,27 @@ body {
   right: 300px;
   z-index: 5;
 }
+
+.corner-flag-top-left {
+  position: absolute;
+  top: 300px;
+  left: 300px;
+}
+
+.corner-flag-bottom-left {
+  position: absolute;
+  bottom: 294px;
+  left: 300px;
+}
+
+.corner-flag-top-right {
+  position: absolute;
+  top: 300px;
+  right: 282px;
+}
+
+.corner-flag-bottom-right {
+  position: absolute;
+  bottom: 294px;
+  right: 282px;
+}

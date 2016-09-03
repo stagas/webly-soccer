@@ -501,6 +501,26 @@ sprite.goal_nets.width = sprite.goal_nets[0].split('\n')[0].length;
 sprite.goal_nets.height = sprite.goal_nets[0].split('\n').length + 5;
 sprite.goal_nets.scale = sprite.scale;
 
+sprite.corner_flag = [`\
+gg
+gggg
+ggggg
+x
+x
+x
+x
+\
+`]
+
+sprite.corner_flag.palette = {
+  'x': '#ccc',
+  'g': '#f00'
+};
+sprite.corner_flag.width = 5;
+sprite.corner_flag.height = sprite.corner_flag[0].split('\n').length - 1;
+sprite.corner_flag.scale = sprite.scale;
+
+
 sprite.create = function createSprite(name) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
