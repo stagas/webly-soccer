@@ -3,7 +3,7 @@ var sprite = require('./sprite');
 module.exports = Player;
 
 function Player() {
-  Object.assign(this, sprite.create('player'));
+  Object.assign(this, sprite.create('player', true));
 
   this.speed = 19;
   this.face = 'stand_down';

@@ -48,6 +48,7 @@ sprite.player = [
 
 // 0: down
 `\
+
     xxx
    xxxxx
   xx...xx
@@ -66,6 +67,7 @@ sprite.player = [
 // 1: down right
 
 `\
+
     xxx
    xxxxx
   xx....
@@ -83,6 +85,7 @@ sprite.player = [
 
 // 2: right
 `\
+
     xxx
    xxxxx
   xxx...
@@ -101,6 +104,7 @@ sprite.player = [
 // 3: up right
 
 `\
+
     xxx
    xxxxx
   xxxxx.
@@ -119,6 +123,7 @@ sprite.player = [
 // 4: up
 
 `\
+
     xxx
    xxxxx
   xxxxxxx
@@ -137,6 +142,7 @@ sprite.player = [
 // 5: run right 1
 
 `\
+
     xxx
    xxxxx
   xxx...
@@ -155,6 +161,7 @@ sprite.player = [
 // 6: run right 2
 
 `\
+
     xxx
    xxxxx
   xxx...
@@ -173,6 +180,7 @@ sprite.player = [
 // 7: run right 3
 
 `\
+
     xxx
    xxxxx
   xxx...
@@ -228,6 +236,7 @@ sprite.player = [
 // 10: run down right 1
 
 `\
+
     xxx
    xxxxx
   xx....
@@ -246,6 +255,7 @@ sprite.player = [
 // 11: run down right 2
 
 `\
+
     xxx
    xxxxx
   xx....
@@ -264,6 +274,7 @@ sprite.player = [
 // 12: run down right 3
 
 `\
+
     xxx
    xxxxx
   xx....
@@ -282,6 +293,7 @@ sprite.player = [
 // 13: run up right 1
 
 `\
+
     xxx
    xxxxx
   xxxxx.
@@ -300,6 +312,7 @@ sprite.player = [
 // 14: run up right 2
 
 `\
+
     xxx
    xxxxx
   xxxxx.
@@ -318,6 +331,7 @@ sprite.player = [
 // 15: run up right 3
 
 `\
+
     xxx
    xxxxx
   xxxxx.
@@ -495,7 +509,7 @@ sprite.goal_nets.palette = {
   '.': 'rgba(150,150,150,.5)',
   '/': 'rgba(180,180,180,.6)',
   '3': 'rgba(0,0,0,.2)',
-  '8': 'rgba(0,0,0,.3)',
+  '8': 'rgba(0,0,0,.25)',
 };
 sprite.goal_nets.width = sprite.goal_nets[0].split('\n')[0].length;
 sprite.goal_nets.height = sprite.goal_nets[0].split('\n').length + 5;
@@ -520,46 +534,59 @@ sprite.corner_flag.palette = {
   'g': '#f00',
   'b': '#c20',
   ';': 'rgba(255,255,255,.1)',
-  '7': 'rgba(0,0,0,.3)',
+  '7': 'rgba(0,0,0,.25)',
 };
 sprite.corner_flag.width = 5;
 sprite.corner_flag.height = sprite.corner_flag[0].split('\n').length - 1;
 sprite.corner_flag.scale = sprite.scale;
 
-sprite.create = function createSprite(name) {
+sprite.create = function createSprite(name, withShadow) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
   var s = sprite[name];
 
+  if (withShadow) {
+    s.palette['%'] = 'rgba(0,0,0,.25)';
+    var padded = s
+      .map(art => 'string' === typeof art ? art.split('\n') : art)
+      .map(art => art.map(row => new Array(s.width + 1).join(' ') + row));
+
+    padded.animation = s.animation;
+    padded.width = s.width *= 3;
+    padded.height = s.height *= 2;
+    padded.palette = s.palette;
+    padded.scale = s.scale;
+    s = padded;
+  }
+
   canvas.width = s.length * s.width * s.scale;
   canvas.height = s.scale * 2 + s.height * s.scale * 2;
 
-  s
-    // normal
-    .map((art, index) => {
-      pixel.art(art)
-      .palette(s.palette)
-      .scale(s.scale).pos({
-        x: s.width * s.scale * index,
-        y: 0
-      })
-      .draw(context);
-      return art;
+  // normal
+  s.forEach((art, index) => {
+    if (withShadow) art = makeShadow(art);
+    pixel.art(art)
+    .palette(s.palette)
+    .scale(s.scale).pos({
+      x: s.width * s.scale * index,
+      y: 0
     })
+    .draw(context);
+  });
 
-    // mirror x
-    .map((art, index) => {
-      if ('string' === typeof art) art = art.split('\n');
-      art = art.map(row => padRight(row, s.width).split('').reverse().join(''));
-      pixel.art(art)
-      .palette(s.palette)
-      .scale(s.scale).pos({
-        x: s.width * s.scale * index,
-        y: s.height * s.scale + s.scale
-      })
-      .draw(context);
-      return art;
-    });
+  // mirror x
+  s.forEach((art, index) => {
+    if ('string' === typeof art) art = art.split('\n');
+    art = art.map(row => padRight(row, s.width).split('').reverse().join(''));
+    if (withShadow) art = makeShadow(art);
+    pixel.art(art)
+    .palette(s.palette)
+    .scale(s.scale).pos({
+      x: s.width * s.scale * index,
+      y: s.height * s.scale + s.scale
+    })
+    .draw(context);
+  });
 
   var dataURL = canvas.toDataURL();
   var div = document.createElement('div');
@@ -578,4 +605,28 @@ sprite.create = function createSprite(name) {
 function padRight(s, n) {
   n = Math.max(n, s.length - 1);
   return s + new Array(n - s.length + 1).join(' ');
+}
+
+function makeShadow(art) {
+  if ('string' === typeof art) art = art.split('\n');
+  art = art.slice();
+  var flipped = art.slice().reverse();
+  var regexp = /[^ ]/g;
+  var size = 0;
+  var skewX = 1;
+  var skewY = 1.3;
+  var shortX = 0;
+  var width = 0;
+  for (var i = 0; i < flipped.length; i += skewY) {
+    size++;
+    skewY += 1.2;
+    skewX += 1;
+    shortX += 0.52;
+    if (shortX > 1.5) regexp = /[^ ]{1,2}/g;
+    if (shortX > 2.5) regexp = /[^ ]{1,3}/g;
+    var row = new Array(skewX | 0).join(' ') + flipped[i | 0].replace(regexp, () => '%');
+    width = row.length;
+    art.push(row);
+  }
+  return art;
 }
