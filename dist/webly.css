@@ -7,7 +7,6 @@ html, body {
 }
 
 body {
-  background-color: #080;
   overflow: hidden;
 }
 
@@ -15,7 +14,7 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  width: 2800px;
+  width: 2754px;
   height: 1700px;
 }
 
@@ -24,7 +23,7 @@ body {
   position: absolute;
   left: 300px;
   top: 300px;
-  width: 2200px;
+  width: 2154px;
   height: 1100px;
   border: 3px solid #fff;
 }
@@ -54,12 +53,12 @@ body {
 ._style__penalty-arc-left {
   position: absolute;
   top: 50%;
-  left: 200px;
+  left: 215px;
 }
 ._style__penalty-spot-left {
   position: absolute;
   top: 50%;
-  left: 200px;
+  left: 215px;
   margin-left: -9px;
   margin-top: -9px;
 }
@@ -67,12 +66,12 @@ body {
 ._style__penalty-arc-right {
   position: absolute;
   top: 50%;
-  right: 200px;
+  right: 215px;
 }
 ._style__penalty-spot-right {
   position: absolute;
   top: 50%;
-  right: 200px;
+  right: 215px;
   margin-right: -9px;
   margin-top: -9px;
 }
@@ -80,10 +79,20 @@ body {
 ._style__penalty-area-left {
   position: absolute;
   top: 247px;
-  width: 300px;
+  width: 315px;
   height: 600px;
   border: 3px solid #fff;
   border-left: none;
+}
+
+._style__penalty-area-right {
+  position: absolute;
+  top: 247px;
+  right: 0;
+  width: 315px;
+  height: 600px;
+  border: 3px solid #fff;
+  border-right: none;
 }
 
 ._style__goal-area-left {
@@ -93,16 +102,6 @@ body {
   height: 306px;
   border: 3px solid #fff;
   border-left: none;
-}
-
-._style__penalty-area-right {
-  position: absolute;
-  top: 247px;
-  right: 0;
-  width: 300px;
-  height: 600px;
-  border: 3px solid #fff;
-  border-right: none;
 }
 
 ._style__goal-area-right {
@@ -152,10 +151,50 @@ body {
   left: 300px;
 }
 
+._style__corner-flag-top-left:before {
+  content: ' ';
+  position: absolute;
+  left: 180px;
+  top: 12px;
+  width: 3px;
+  height: 6px;
+  background: #fff;
+}
+
+._style__corner-flag-top-left:after {
+  content: ' ';
+  position: absolute;
+  left: -6px;
+  top: 195px;
+  width: 6px;
+  height: 3px;
+  background: #fff;
+}
+
 ._style__corner-flag-bottom-left {
   position: absolute;
   bottom: 285px;
   left: 300px;
+}
+
+._style__corner-flag-bottom-left:before {
+  content: ' ';
+  position: absolute;
+  left: 180px;
+  top: 21px;
+  width: 3px;
+  height: 6px;
+  background: #fff;
+}
+
+._style__corner-flag-bottom-left:after {
+  content: ' ';
+  position: absolute;
+  left: -6px;
+  top: -162px;
+  width: 6px;
+  height: 3px;
+  background: #fff;
 }
 
 ._style__corner-flag-top-right {
@@ -164,8 +203,48 @@ body {
   right: 282px;
 }
 
+._style__corner-flag-top-right:before {
+  content: ' ';
+  position: absolute;
+  left: -180px;
+  top: 12px;
+  width: 3px;
+  height: 6px;
+  background: #fff;
+}
+
+._style__corner-flag-top-right:after {
+  content: ' ';
+  position: absolute;
+  left: 3px;
+  top: 195px;
+  width: 6px;
+  height: 3px;
+  background: #fff;
+}
+
 ._style__corner-flag-bottom-right {
   position: absolute;
   bottom: 285px;
   right: 282px;
+}
+
+._style__corner-flag-bottom-right:before {
+  content: ' ';
+  position: absolute;
+  left: -180px;
+  top: 21px;
+  width: 3px;
+  height: 6px;
+  background: #fff;
+}
+
+._style__corner-flag-bottom-right:after {
+  content: ' ';
+  position: absolute;
+  left: 3px;
+  top: -162px;
+  width: 6px;
+  height: 3px;
+  background: #fff;
 }

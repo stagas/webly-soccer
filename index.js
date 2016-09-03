@@ -15,7 +15,7 @@ document.body.appendChild(player.el);
 // player.pos.x = player.px.x = 2300 / 2 - player.width * player.scale / 2;
 // player.pos.y = player.px.y = 1700 / 2 - player.height * player.scale;
 player.pos.y = player.px.y = 500;
-player.pos.x = player.px.x = 2000;
+player.pos.x = player.px.x = 500;
 
 /* loop */
 
@@ -28,7 +28,7 @@ loop.on('update', () => {
 
 loop.on('render', render);
 
-loop.fps(10).start();
+loop.fps(14).start();
 
 function update() {
   player.update();
