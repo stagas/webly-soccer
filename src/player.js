@@ -1,11 +1,16 @@
+var css = require('../style.css');
 var sprite = require('./sprite');
 
 module.exports = Player;
 
-function Player() {
-  Object.assign(this, sprite.create('player', true));
+function Player(ball) {
+  Object.assign(this, sprite.create('player'));
 
+  this.el.className = css.player;
   this.speed = 19;
+
+  this.ball = ball;
+
   this.face = 'stand_down';
   this.faceDuration = 4;
   this.faceIndex = 0;
@@ -39,7 +44,15 @@ Player.prototype.move = function(x, y){
   this.vel.y |= y;
 };
 
+Player.prototype.collisionWith = function(target) {
+  var dx = this.pos.x - target.pos.x
+  var dy = this.pos.y - target.pos.y
+  var dist = Math.sqrt(dx*dx + dy*dy);
+  return dist;
+};
+
 Player.prototype.update = function() {
+  this.angle = Math.atan2(this.vel.y, this.vel.x);
   this.face = this.faceMap[this.vel];
   this.faceStandMap['0,0'] =
   this.faceMap['0,0'] = this.faceStandMap[this.vel];
@@ -47,8 +60,19 @@ Player.prototype.update = function() {
   var speed = this.speed;
   if (this.vel.x && this.vel.y) speed *= 0.75;
 
+  var col = this.collisionWith(this.ball);
+  if (col < 16) {
+    var rand = (0.85 + Math.random() * 0.46);
+    if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
+    if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
+  } else if (col < 26 && col >= 16) {
+    this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.18;
+    this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.18;
+  }
+
   this.pos.x += this.vel.x * speed | 0;
   this.pos.y += this.vel.y * speed | 0;
+
   this.vel.x = 0;
   this.vel.y = 0;
 };

@@ -9,22 +9,49 @@ sprite.scale = 3;
 // ball
 
 sprite.ball = [
+
+`\
+ oo
+oxox
+oooo
+ xo\
+`,
+
 `\
  ox
 xooo
 ooxo
  oo\
-`,`\
+`,
+
+`\
+ ox
+oooo
+oxox
+ oo\
+`,
+
+`\
+ oo
+oxox
+oooo
+ ox\
+`,
+
+`\
+ oo
+xoxo
+oooo
+ xo\
+`,
+
+`\
  xo
 oooo
 xoxo
  oo\
-`,`\
- xo
-oooo
-xoxo
- oo\
-`
+`,
+
 ];
 
 sprite.ball.palette = {
@@ -32,17 +59,25 @@ sprite.ball.palette = {
   'x': '#000'
 };
 
+sprite.ball.width = 4;
+sprite.ball.height = 4;
+sprite.ball.scale = sprite.scale;
+
 // ball shadow
 
 sprite.ball_shadow = [`\
- 777
-77777
- 777\
+ 77
+7777
+ 77\
 `];
 
 sprite.ball_shadow.palette = {
-  '7': 'rgba(0,0,0,0.3)'
+  '7': 'rgba(0,0,0,0.25)'
 };
+
+sprite.ball_shadow.width = 5;
+sprite.ball_shadow.height = 3;
+sprite.ball_shadow.scale = sprite.scale;
 
 sprite.player = [
 
@@ -653,8 +688,10 @@ sprite.create = function createSprite(name) {
   return merge({
     el: div,
     px: new Point,
+    angle: 0,
     pos: new Point,
     vel: new Point,
+    sprite: s,
   }, s);
 };
 

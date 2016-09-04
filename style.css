@@ -10,6 +10,14 @@ body {
   overflow: hidden;
 }
 
+.dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: red;
+  z-index: 1000;
+}
+
 .stadium {
   position: absolute;
   left: 0;
@@ -27,6 +35,17 @@ body {
   height: 1100px;
   border: 3px solid #fff;
   opacity: 0.87;
+}
+
+.player {
+  margin-left: -48px;
+  margin-top: -39px;
+}
+
+.ball,
+.ball-shadow {
+  margin-left: -5px;
+  margin-top: -9px;
 }
 
 .halfway-line {
