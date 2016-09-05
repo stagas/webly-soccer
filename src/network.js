@@ -1,4 +1,4 @@
-var url = 'ws://webly-soccer.herokuapp.com/';
+var url = 'ws://soccer.stagas.com:6662/';
 var Peer = require('simple-peer');
 var json = JSON.stringify;
 var parse = JSON.parse;
