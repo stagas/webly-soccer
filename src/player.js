@@ -3,8 +3,10 @@ var sprite = require('./sprite');
 
 module.exports = Player;
 
-function Player(ball, data) {
+function Player(game, data) {
   data = data || {};
+
+  this.game = game;
 
   this.colors = data.colors || {
     't': `rgb(${Math.random() * 256 | 0}, ${Math.random() * 256 | 0}, ${Math.random() * 256 | 0})`,
@@ -22,7 +24,8 @@ function Player(ball, data) {
 
   this.speed = 19;
 
-  this.ball = ball;
+  this.stadium = this.game.stadium;
+  this.ball = this.game.ball;
 
   this.face = 'stand_down';
   this.faceDuration = 4;
@@ -85,6 +88,9 @@ Player.prototype.update = function() {
 
   this.pos.x += this.vel.x * speed | 0;
   this.pos.y += this.vel.y * speed | 0;
+
+  this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(this.pos.x, this.stadium.bounds[0].x));
+  this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(this.pos.y, this.stadium.bounds[0].y));
 };
 
 Player.prototype.render = function(dt, alpha) {

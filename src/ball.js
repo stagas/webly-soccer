@@ -3,8 +3,10 @@ var sprite = require('./sprite');
 
 module.exports = Ball;
 
-function Ball() {
+function Ball(game) {
   Object.assign(this, sprite.create('ball'));
+  this.game = game;
+  this.stadium = this.game.stadium;
   this.el.className = css.ball;
   this.shadow = sprite.create('ball_shadow');
   this.shadow.el.className = css['ball-shadow'];
@@ -23,6 +25,16 @@ Ball.prototype.update = function() {
 
   this.pos.x += this.vel.x > 0 ? Math.min(30, this.vel.x) : Math.max(-30, this.vel.x);
   this.pos.y += this.vel.y > 0 ? Math.min(30, this.vel.y) : Math.max(-30, this.vel.y);
+
+  if (this.pos.x < this.stadium.bounds[0].x || this.pos.x > this.stadium.bounds[1].x) {
+    this.vel.x = -this.vel.x;
+  }
+  if (this.pos.y < this.stadium.bounds[0].y || this.pos.y > this.stadium.bounds[1].y) {
+    this.vel.y = -this.vel.y;
+  }
+
+  this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(this.pos.x, this.stadium.bounds[0].x));
+  this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(this.pos.y, this.stadium.bounds[0].y));
 
   this.vel.x *= this.friction;
   this.vel.y *= this.friction;

@@ -4,6 +4,18 @@ var sprite = require('./sprite');
 module.exports = Stadium;
 
 function Stadium() {
+  this.area = [
+    { x: 300, y: 300 },
+    { x: 2154 + 300, y: 1100 + 300 }
+  ];
+
+  var boundsMargin = 90;
+
+  this.bounds = [
+    { x: this.area[0].x - boundsMargin, y: this.area[0].y - boundsMargin },
+    { x: this.area[1].x + boundsMargin, y: this.area[1].y + boundsMargin }
+  ];
+
   this.el = document.createElement('div');
   this.el.className = css.stadium;
 

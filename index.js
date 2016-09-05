@@ -9,20 +9,22 @@ var connect = require('./src/network');
 
 var keys = arrows(document.body);
 
-var stadium = new Stadium;
-var ball = new Ball;
-var player = new Player(ball);
-var camera = new Camera(ball);
+var game = {};
+
+var stadium = game.stadium = new Stadium;
+var ball = game.ball = new Ball(game);
+var player = game.player = new Player(game);
+var camera = game.camera = new Camera(ball);
 
 document.body.appendChild(stadium.el);
 document.body.appendChild(player.el);
 document.body.appendChild(ball.shadow.el);
 document.body.appendChild(ball.el);
 
-ball.pos.y = ball.px.y = 60;
-ball.pos.x = ball.px.x = 50;
-ball.vel.x = 100;
-ball.vel.y = 100;
+ball.pos.y = ball.px.y = 300;
+ball.pos.x = ball.px.x = 300;
+ball.vel.x = 10;
+ball.vel.y = 10;
 
 /* loop */
 
