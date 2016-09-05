@@ -10,8 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "pixel-art": "^1.1.0",
-    "signalhub": "^4.7.4",
-    "webrtc-swarm": "^2.8.0"
+    "simple-peer": "^6.0.7"
   },
   "devDependencies": {
     "css-modulesify": "^0.25.1",

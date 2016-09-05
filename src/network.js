@@ -1,27 +1,50 @@
-var swarm = require('webrtc-swarm');
-var signalhub = require('signalhub');
+var url = 'ws://webly-soccer.herokuapp.com/';
+var Peer = require('simple-peer');
+var json = JSON.stringify;
+var parse = JSON.parse;
 
-var hub = signalhub('swarm-example', ['https://webly-soccer.herokuapp.com/']);
+module.exports = function(onpeer, ondata, ondisconnect) {
+  var connectTimeout;
+  var peer;
 
-var uuid = (Math.random() * 10e6).toString(36);
+  connect();
 
-module.exports = function connect(onpeer, ondata, ondisconnect) {
-  var sw = swarm(hub, {
-    uuid: uuid,
-    maxPeers: 1,
-  });
+  function connect() {
+    var ws = new WebSocket(url);
 
-  sw.on('peer', function (peer, id) {
-    console.log('connected to a new peer:', id);
-    console.log('total peers:', sw.peers.length);
+    ws.onclose = ws.onerror = reconnect;
 
-    onpeer(peer, id);
-    peer.on('data', ondata);
-  })
+    ws.onopen = e => {
+      console.log('connected');
+    };
 
-  sw.on('disconnect', function (peer, id) {
-    console.log('disconnected from a peer:', id)
-    console.log('total peers:', sw.peers.length)
+    ws.onmessage = raw => {
+      var msg = parse(raw.data);
+      switch (msg.type) {
+        case 'start':
+          peer = new Peer({ initiator: msg.initiator });
+          peer.on('connect', () => {
+            console.log('connected to peer!');
+            onpeer(peer);
+          });
+          peer.on('data', ondata);
+
+          peer.on('signal', signal => {
+            ws.send(json({ type: 'signal', signal: signal }));
+          });
+          break;
+
+        case 'signal':
+          peer.signal(msg.signal);
+          break;
+      }
+    };
+  }
+
+  function reconnect() {
     ondisconnect(peer);
-  });
+    console.log('connection dropped, reconnecting...');
+    clearTimeout(connectTimeout);
+    connectTimeout = setTimeout(connect, 1000);
+  }
 };
