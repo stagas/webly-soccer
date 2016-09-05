@@ -18,8 +18,8 @@ function Player(game, data) {
 
   this.el.className = css.player;
 
-  this.pos.x = this.px.x = data.pos ? data.pos.x : 2000 + Math.random() * 200 | 0;
-  this.pos.y = this.px.y = data.pos ? data.pos.y : 600 + Math.random() * 200 | 0;
+  this.pos.x = this.px.x = data.pos ? data.pos.x : 300 + Math.random() * 200 | 0;
+  this.pos.y = this.px.y = data.pos ? data.pos.y : 200 + Math.random() * 200 | 0;
   this.vel.x = data.vel ? data.vel.x : 0;
   this.vel.y = data.vel ? data.vel.y : 0;
 
@@ -145,9 +145,6 @@ Player.prototype.update = function() {
     } else {
       pos.y -= 4;
     }
-    // this.vel.y = 0;
-    // this.vel.y = -this.vel.y;
-    // this.vel.y *= 0.3;
   } else {
     point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.bottom);
     if (point) {
@@ -157,9 +154,6 @@ Player.prototype.update = function() {
       } else {
         pos.y += 9;
       }
-      // this.vel.y = 0;
-      // this.vel.y = -this.vel.y;
-      // this.vel.y *= 0.3;
     }
   }
 
@@ -171,9 +165,6 @@ Player.prototype.update = function() {
     } else {
       pos.y -= 4;
     }
-    // this.vel.y = 0;
-    this.vel.y = -this.vel.y;
-    this.vel.y *= 0.3;
   } else {
     point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.bottom);
     if (point) {
@@ -183,9 +174,6 @@ Player.prototype.update = function() {
       } else {
         pos.y += 9;
       }
-      // this.vel.y = 0;
-      // this.vel.y = -this.vel.y;
-      // this.vel.y *= 0.3;
     }
   }
 
@@ -197,9 +185,6 @@ Player.prototype.update = function() {
     } else {
       pos.x -= 8;
     }
-    // this.vel.x = 0;
-    // this.vel.x = -this.vel.x;
-    // this.vel.x *= 0.15;
   }
 
   point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.back);
@@ -210,9 +195,6 @@ Player.prototype.update = function() {
     } else {
       pos.x -= 8;
     }
-    // this.vel.x = 0;
-    // this.vel.x = -this.vel.x;
-    // this.vel.x *= 0.15;
   }
 
   this.pos.x = pos.x;

@@ -21,8 +21,8 @@ document.body.appendChild(player.el);
 document.body.appendChild(ball.shadow.el);
 document.body.appendChild(ball.el);
 
-ball.prev.x = ball.pos.x = ball.px.x = 2200;
-ball.prev.y = ball.pos.y = ball.px.y = 800;
+ball.prev.x = ball.pos.x = ball.px.x = 400;
+ball.prev.y = ball.pos.y = ball.px.y = 400;
 ball.vel.x = 10;
 ball.vel.y = 10;
 ball.vel.z = 0;
