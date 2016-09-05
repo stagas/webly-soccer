@@ -3,10 +3,23 @@ var sprite = require('./sprite');
 
 module.exports = Player;
 
-function Player(ball) {
-  Object.assign(this, sprite.create('player'));
+function Player(ball, data) {
+  data = data || {};
+
+  this.colors = data.colors || {
+    't': `rgb(${Math.random() * 256 | 0}, ${Math.random() * 256 | 0}, ${Math.random() * 256 | 0})`,
+    'p': `rgb(${Math.random() * 256 | 0}, ${Math.random() * 256 | 0}, ${Math.random() * 256 | 0})`,
+  };
+
+  Object.assign(this, sprite.create('player', this.colors));
 
   this.el.className = css.player;
+
+  this.pos.x = this.px.x = data.pos ? data.pos.x : 300 + Math.random() * 200 | 0;
+  this.pos.y = this.px.y = data.pos ? data.pos.y : 300 + Math.random() * 200 | 0;
+  this.vel.x = data.vel ? data.vel.x : 0;
+  this.vel.y = data.vel ? data.vel.y : 0;
+
   this.speed = 19;
 
   this.ball = ball;
@@ -62,19 +75,16 @@ Player.prototype.update = function() {
 
   var col = this.collisionWith(this.ball);
   if (col < 16) {
-    var rand = (0.85 + Math.random() * 0.46);
+    var rand = 0.85 + Math.random() * 0.46;
     if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
     if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
   } else if (col < 26 && col >= 16) {
-    this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.18;
-    this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.18;
+    this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.19;
+    this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.19;
   }
 
   this.pos.x += this.vel.x * speed | 0;
   this.pos.y += this.vel.y * speed | 0;
-
-  this.vel.x = 0;
-  this.vel.y = 0;
 };
 
 Player.prototype.render = function(dt, alpha) {

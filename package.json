@@ -9,7 +9,9 @@
   "author": "stagas",
   "license": "MIT",
   "dependencies": {
-    "pixel-art": "^1.1.0"
+    "pixel-art": "^1.1.0",
+    "signalhub": "^4.7.4",
+    "webrtc-swarm": "^2.8.0"
   },
   "devDependencies": {
     "css-modulesify": "^0.25.1",

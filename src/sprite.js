@@ -627,13 +627,15 @@ sprite.corner_flag.width = 5;
 sprite.corner_flag.height = sprite.corner_flag[0].split('\n').length - 1;
 sprite.corner_flag.scale = sprite.scale;
 
-sprite.create = function createSprite(name) {
+sprite.create = function createSprite(name, palette) {
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
   var s = sprite[name];
 
+  palette = merge(merge({}, s.palette), palette)
+
   if (s.shadow) {
-    s.palette['%'] = 'rgba(0,0,0,.25)';
+    palette['%'] = 'rgba(0,0,0,.25)';
     var padded = s
       .map(art => 'string' === typeof art ? art.split('\n') : art)
       .map(art => art.map(row => new Array(s.width + 1).join(' ') + row));
@@ -644,7 +646,7 @@ sprite.create = function createSprite(name) {
     padded.height = s.height * 2;
     padded.left = s.left + s.width / 3 | 0;
     padded.top = s.top;
-    padded.palette = s.palette;
+    padded.palette = palette;
     padded.scale = s.scale;
     s = padded;
   }
@@ -656,7 +658,7 @@ sprite.create = function createSprite(name) {
   s.forEach((art, index) => {
     if (s.shadow) art = s.shadow(art);
     pixel.art(art)
-    .palette(s.palette)
+    .palette(palette)
     .scale(s.scale).pos({
       x: s.width * s.scale * index,
       y: 0
@@ -670,7 +672,7 @@ sprite.create = function createSprite(name) {
     art = art.map(row => padRight(row, s.width).split('').reverse().join(''));
     if (s.shadow) art = s.shadow(art);
     pixel.art(art)
-    .palette(s.palette)
+    .palette(palette)
     .scale(s.scale).pos({
       x: s.width * s.scale * index,
       y: s.height * s.scale + s.scale
