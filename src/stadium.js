@@ -19,6 +19,30 @@ function Stadium() {
   this.el = document.createElement('div');
   this.el.className = css.stadium;
 
+  this.debugCanvas = document.createElement('canvas');
+  this.debugCanvas.className = css.stadium;
+  this.debugCanvas.width = '2754';
+  this.debugCanvas.height = '1700';
+  this.debugCanvas.style.zIndex = 10000;
+  // this.el.appendChild(this.debugCanvas);
+  var ctx = this.debugCanvas.getContext('2d');
+  ctx.strokeStyle = '#f00';
+  ctx.rect(246, 785, 303 - 246, 924 - 785);
+  ctx.rect(2457, 785, 303 - 246, 924 - 785);
+  ctx.stroke();
+
+  this.leftGoalArea = {
+    top: [{ x: 233, y: 785 }, { x: 303, y: 785 }],
+    bottom: [{ x: 233, y: 925 }, { x: 303, y: 925 }],
+    back: [{ x: 247, y: 780 }, { x: 247, y: 929 }],
+  };
+
+  this.rightGoalArea = {
+    top: [{ x: 2457, y: 785 }, { x: 2525, y: 785 }],
+    bottom: [{ x: 2457, y: 925 }, { x: 2525, y: 925 }],
+    back: [{ x: 2512, y: 781 }, { x: 2512, y: 928 }],
+  };
+
   var grass = createGrass();
   this.el.style.background = 'url(' + grass.toDataURL() + ') -60px 0px';
 

@@ -18,8 +18,8 @@ function Player(game, data) {
 
   this.el.className = css.player;
 
-  this.pos.x = this.px.x = data.pos ? data.pos.x : 300 + Math.random() * 200 | 0;
-  this.pos.y = this.px.y = data.pos ? data.pos.y : 300 + Math.random() * 200 | 0;
+  this.pos.x = this.px.x = data.pos ? data.pos.x : 2000 + Math.random() * 200 | 0;
+  this.pos.y = this.px.y = data.pos ? data.pos.y : 600 + Math.random() * 200 | 0;
   this.vel.x = data.vel ? data.vel.x : 0;
   this.vel.y = data.vel ? data.vel.y : 0;
 
@@ -28,6 +28,7 @@ function Player(game, data) {
 
   this.speed = 19;
   this.shootTimer = 0;
+  this.angle = 0;
 
   this.face = 'stand_down';
   this.faceDuration = 4;
@@ -75,7 +76,7 @@ Player.prototype.shootEnd = function() {
 };
 
 Player.prototype.pass = function() {
-  console.log('should pass');
+  // console.log('should pass');
 };
 
 Player.prototype.maybeShoot = function() {
@@ -86,7 +87,7 @@ Player.prototype.maybeShoot = function() {
 };
 
 Player.prototype.actuallyShoot = function() {
-  console.log('should shoot');
+  // console.log('should shoot');
   if (this.collisionWith(this.ball) < 26) {
     this.shooting = true;
   }
@@ -100,7 +101,9 @@ Player.prototype.collisionWith = function(target) {
 };
 
 Player.prototype.update = function() {
-  this.angle = Math.atan2(this.vel.y, this.vel.x);
+  if (this.vel.x || this.vel.y) {
+    this.angle = Math.atan2(this.vel.y, this.vel.x);
+  }
 
   this.face = this.faceMap[this.vel];
   this.faceStandMap['0,0'] =
@@ -127,8 +130,93 @@ Player.prototype.update = function() {
     this.shooting = false;
   }
 
-  this.pos.x += this.vel.x * speed | 0;
-  this.pos.y += this.vel.y * speed | 0;
+  var pos = {
+    x: this.pos.x + (this.vel.x * speed | 0),
+    y: this.pos.y + (this.vel.y * speed | 0)
+  };
+
+  var point;
+
+  point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.top);
+  if (point) {
+    pos.y = point.y;
+    if (this.pos.y >= pos.y) {
+      pos.y += 11;
+    } else {
+      pos.y -= 4;
+    }
+    // this.vel.y = 0;
+    // this.vel.y = -this.vel.y;
+    // this.vel.y *= 0.3;
+  } else {
+    point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.bottom);
+    if (point) {
+      pos.y = point.y;
+      if (this.pos.y <= pos.y) {
+        pos.y -= 6;
+      } else {
+        pos.y += 9;
+      }
+      // this.vel.y = 0;
+      // this.vel.y = -this.vel.y;
+      // this.vel.y *= 0.3;
+    }
+  }
+
+  point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.top);
+  if (point) {
+    pos.y = point.y;
+    if (this.pos.y >= pos.y) {
+      pos.y += 11;
+    } else {
+      pos.y -= 4;
+    }
+    // this.vel.y = 0;
+    this.vel.y = -this.vel.y;
+    this.vel.y *= 0.3;
+  } else {
+    point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.bottom);
+    if (point) {
+      pos.y = point.y;
+      if (this.pos.y <= pos.y) {
+        pos.y -= 6;
+      } else {
+        pos.y += 9;
+      }
+      // this.vel.y = 0;
+      // this.vel.y = -this.vel.y;
+      // this.vel.y *= 0.3;
+    }
+  }
+
+  point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.back);
+  if (point) {
+    pos.x = point.x;
+    if (this.pos.x >= pos.x) {
+      pos.x += 7;
+    } else {
+      pos.x -= 8;
+    }
+    // this.vel.x = 0;
+    // this.vel.x = -this.vel.x;
+    // this.vel.x *= 0.15;
+  }
+
+  point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.back);
+  if (point) {
+    pos.x = point.x;
+    if (this.pos.x > pos.x) {
+      pos.x += 7;
+    } else {
+      pos.x -= 8;
+    }
+    // this.vel.x = 0;
+    // this.vel.x = -this.vel.x;
+    // this.vel.x *= 0.15;
+  }
+
+  this.pos.x = pos.x;
+  this.pos.y = pos.y;
 
   this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(this.pos.x, this.stadium.bounds[0].x));
   this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(this.pos.y, this.stadium.bounds[0].y));
