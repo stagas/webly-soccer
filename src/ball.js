@@ -10,7 +10,9 @@ function Ball(game) {
   this.el.className = css.ball;
   this.shadow = sprite.create('ball_shadow');
   this.shadow.el.className = css['ball-shadow'];
-  this.friction = 0.88;
+  this.friction = 0.91;
+  this.airFriction = 0.95;
+  this.gravity = 2.65;
   this.faceIndex = 0;
   this.faceNeedle = 0;
   this.faceDuration = 4;
@@ -23,8 +25,11 @@ Ball.prototype.update = function() {
   if (dir !== this.dir) this.randomizeRotate();
   this.dir = dir;
 
-  this.pos.x += this.vel.x > 0 ? Math.min(30, this.vel.x) : Math.max(-30, this.vel.x);
-  this.pos.y += this.vel.y > 0 ? Math.min(30, this.vel.y) : Math.max(-30, this.vel.y);
+  this.pos.x += this.vel.x > 0 ? Math.min(50, this.vel.x) : Math.max(-50, this.vel.x);
+  this.pos.y += this.vel.y > 0 ? Math.min(50, this.vel.y) : Math.max(-50, this.vel.y);
+  this.pos.z += this.vel.z;
+
+  this.pos.z = Math.round(this.pos.z);
 
   if (this.pos.x < this.stadium.bounds[0].x || this.pos.x > this.stadium.bounds[1].x) {
     this.vel.x = -this.vel.x;
@@ -32,12 +37,18 @@ Ball.prototype.update = function() {
   if (this.pos.y < this.stadium.bounds[0].y || this.pos.y > this.stadium.bounds[1].y) {
     this.vel.y = -this.vel.y;
   }
+  if (this.pos.z < 0) {
+    this.vel.z = -this.vel.z;
+    this.vel.z *= 0.72;
+  }
 
   this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(this.pos.x, this.stadium.bounds[0].x));
   this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(this.pos.y, this.stadium.bounds[0].y));
+  this.pos.z = Math.max(0, this.pos.z);
 
-  this.vel.x *= this.friction;
-  this.vel.y *= this.friction;
+  this.vel.x *= this.pos.z > 1 ? this.airFriction : this.friction;
+  this.vel.y *= this.pos.z > 1 ? this.airFriction : this.friction;
+  this.vel.z -= this.gravity;
 
   var avx = Math.abs(this.vel.x);
   var avy = Math.abs(this.vel.y);
@@ -57,6 +68,7 @@ Ball.prototype.randomizeRotate = function() {
 Ball.prototype.render = function(dt, alpha) {
   this.px.x += (this.pos.x - this.px.x) * alpha;
   this.px.y += (this.pos.y - this.px.y) * alpha;
+  this.px.z += (this.pos.z - this.px.z) * alpha;
 
   var i = this.faceIndex;
   var n = this.faceNeedle;
@@ -69,12 +81,12 @@ Ball.prototype.render = function(dt, alpha) {
 
   Object.assign(this.el.style, {
     left: this.px.x + 'px',
-    top: this.px.y + 'px',
+    top: (this.px.y - this.px.z) + 'px',
     backgroundPosition: `-${x}px -0px`,
   });
 
   Object.assign(this.shadow.el.style, {
-    left: this.px.x + 1 * this.scale + 'px',
-    top: this.px.y + 2 * this.scale + 'px',
+    left: (this.px.x + this.px.z / 2) + 1 * this.scale + 'px',
+    top: (this.px.y + this.px.z / 3) + 2 * this.scale + 'px',
   });
 };

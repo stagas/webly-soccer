@@ -1,4 +1,5 @@
 var css = require('../style.css');
+var math = require('../lib/math');
 var sprite = require('./sprite');
 
 module.exports = Player;
@@ -22,10 +23,11 @@ function Player(game, data) {
   this.vel.x = data.vel ? data.vel.x : 0;
   this.vel.y = data.vel ? data.vel.y : 0;
 
-  this.speed = 19;
-
   this.stadium = this.game.stadium;
   this.ball = this.game.ball;
+
+  this.speed = 19;
+  this.shootTimer = 0;
 
   this.face = 'stand_down';
   this.faceDuration = 4;
@@ -60,6 +62,36 @@ Player.prototype.move = function(x, y){
   this.vel.y |= y;
 };
 
+Player.prototype.shoot = function() {
+  this.shootTimer++;
+  this.maybeShoot();
+};
+
+Player.prototype.shootEnd = function() {
+  if (this.shootTimer) {
+    this.pass();
+    this.shootTimer = 0;
+  }
+};
+
+Player.prototype.pass = function() {
+  console.log('should pass');
+};
+
+Player.prototype.maybeShoot = function() {
+  if (this.shootTimer > 7) {
+    this.actuallyShoot();
+    this.shootTimer = 0;
+  }
+};
+
+Player.prototype.actuallyShoot = function() {
+  console.log('should shoot');
+  if (this.collisionWith(this.ball) < 26) {
+    this.shooting = true;
+  }
+};
+
 Player.prototype.collisionWith = function(target) {
   var dx = this.pos.x - target.pos.x
   var dy = this.pos.y - target.pos.y
@@ -69,6 +101,7 @@ Player.prototype.collisionWith = function(target) {
 
 Player.prototype.update = function() {
   this.angle = Math.atan2(this.vel.y, this.vel.x);
+
   this.face = this.faceMap[this.vel];
   this.faceStandMap['0,0'] =
   this.faceMap['0,0'] = this.faceStandMap[this.vel];
@@ -84,6 +117,14 @@ Player.prototype.update = function() {
   } else if (col < 26 && col >= 16) {
     this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.19;
     this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.19;
+  }
+
+  if (this.shooting) {
+    var vel = math.angleToCoords(this.angle);
+    this.ball.vel.x = vel.x * 3 * speed;
+    this.ball.vel.y = vel.y * 3 * speed;
+    this.ball.vel.z = 10;
+    this.shooting = false;
   }
 
   this.pos.x += this.vel.x * speed | 0;

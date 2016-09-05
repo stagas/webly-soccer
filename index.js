@@ -7,7 +7,7 @@ var Player = require('./src/player');
 var Ball = require('./src/ball');
 var connect = require('./src/network');
 
-var keys = arrows(document.body);
+var keys = arrows(document.body, onkeys);
 
 var game = {};
 
@@ -25,6 +25,7 @@ ball.pos.y = ball.px.y = 300;
 ball.pos.x = ball.px.x = 300;
 ball.vel.x = 10;
 ball.vel.y = 10;
+ball.vel.z = 0;
 
 /* loop */
 
@@ -87,6 +88,11 @@ function controls(k, player) {
   k & keys.up    && player.move(0,-1);
   k & keys.right && player.move(1,0);
   k & keys.down  && player.move(0,1);
+  k & keys.shoot ? player.shoot() : player.shootEnd();
+}
+
+function onkeys(k) {
+  k & keys.shoot ? player.shoot() : player.shootEnd();
 }
 
 /* network */
@@ -112,7 +118,7 @@ connect(
     var json = new TextDecoder('utf-8').decode(message);
     var data = JSON.parse(json);
     if (data.colors) {
-      opponent.player = new Player(ball, data);
+      opponent.player = new Player(game, data);
       opponent.keys = data.keys;
 
       document.body.appendChild(opponent.player.el);
@@ -128,6 +134,7 @@ connect(
         ball.pos.y = data.ball.pos.y;
         ball.vel.x = data.ball.vel.x;
         ball.vel.y = data.ball.vel.y;
+        ball.vel.z = data.ball.vel.z;
       }
     }
   },
