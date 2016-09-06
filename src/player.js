@@ -80,7 +80,7 @@ Player.prototype.pass = function() {
 };
 
 Player.prototype.maybeShoot = function() {
-  if (this.shootTimer > 7) {
+  if (this.shootTimer > 4) {
     this.actuallyShoot();
     this.shootTimer = 0;
   }
@@ -112,14 +112,16 @@ Player.prototype.update = function() {
   var speed = this.speed;
   if (this.vel.x && this.vel.y) speed *= 0.75;
 
-  var col = this.collisionWith(this.ball);
-  if (col < 16) {
-    var rand = 0.85 + Math.random() * 0.46;
-    if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
-    if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
-  } else if (col < 26 && col >= 16) {
-    this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
-    this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
+  if (this.ball.pos.z <= this.pos.z + 12 * this.scale) {
+    var col = this.collisionWith(this.ball);
+    if (col < 16) {
+      var rand = 0.85 + Math.random() * 0.46;
+      if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
+      if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
+    } else if (col < 26 && col >= 16) {
+      this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
+      this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
+    }
   }
 
   var pos = {
