@@ -21,17 +21,17 @@ document.body.appendChild(player.el);
 document.body.appendChild(ball.shadow.el);
 document.body.appendChild(ball.el);
 
-var start = { x: 2470, y: stadium.rightGoalArea.top[0].y + 10, z: 0 };
+var start = { x: 324, y: stadium.rightGoalArea.top[0].y + 20, z: 130 };
 camera.pos.x = camera.px.x = start.x - camera.size.x / 2;
 camera.pos.y = camera.px.y = start.y - camera.size.y / 2;
 ball.prev.x = ball.pos.x = ball.px.x = start.x;
 ball.prev.y = ball.pos.y = ball.px.y = start.y;
 ball.prev.z = ball.pos.z = ball.px.z = start.z;
 player.pos.x = player.px.x = start.x + 40;
-player.pos.y = player.px.y = start.y;
-ball.vel.x = 0;
+player.pos.y = player.px.y = start.y + 100;
+ball.vel.x = -2.28;
 ball.vel.y = 0;
-ball.vel.z = 100;
+ball.vel.z = 0;
 
 /* loop */
 

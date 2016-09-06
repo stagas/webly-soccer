@@ -2,6 +2,7 @@
   "name": "webly-soccer",
   "version": "0.0.1",
   "description": "a soccer game",
+  "repository": "https://github.com/stagas/webly-soccer",
   "main": "index.js",
   "scripts": {
     "test": "make test"
@@ -9,7 +10,7 @@
   "author": "stagas",
   "license": "MIT",
   "dependencies": {
-    "line-circle-collision": "^1.1.3",
+    "geom-collision": "^0.2.5",
     "pixel-art": "^1.1.0",
     "ray-vs-line-segment": "^2.0.0",
     "simple-peer": "^6.0.7"

@@ -168,16 +168,17 @@ Ball.prototype.update = function() {
       this.vel.x *= 0.15;
     }
 
-    var hit = math.lineCircleCollision([this.prev, pos], this.stadium.leftGoalArea.top[1], 12)
-      || math.lineCircleCollision([this.prev, pos], this.stadium.leftGoalArea.bottom[1], 12)
-      || math.lineCircleCollision([this.prev, pos], this.stadium.rightGoalArea.top[0], 12)
-      || math.lineCircleCollision([this.prev, pos], this.stadium.rightGoalArea.bottom[0], 12);
+    var hit = math.lineCircleCollision([this.prev, pos], this.stadium.leftGoalArea.top[1], 9)
+      || math.lineCircleCollision([this.prev, pos], this.stadium.leftGoalArea.bottom[1], 9)
+      || math.lineCircleCollision([this.prev, pos], this.stadium.rightGoalArea.top[0], 9)
+      || math.lineCircleCollision([this.prev, pos], this.stadium.rightGoalArea.bottom[0], 9);
 
     if (hit) {
       var power = (Math.abs(this.vel.x) + Math.abs(this.vel.y)) / 2
       this.vel.x = hit.vel.x * power;
       this.vel.y = hit.vel.y * power;
-      pos.x += ((hit.pos.x + hit.vel.x * 2) - pos.x) * .9;
+      pos.x = hit.pos.x + hit.vel.x;
+      pos.y = hit.pos.y + hit.vel.y;
       this.shooting = 0;
     }
   }
@@ -194,11 +195,11 @@ Ball.prototype.update = function() {
         );
         if (pos.z >= netsHeight) {
           pos.z = netsHeight;
-          this.vel.z = 0;
+          this.vel.z = -this.vel.z;
         }
       } else if (pos.z <= netsHeight) {
         pos.z = netsHeight + 1;
-        pos.x -= 1;
+        pos.x -= 2;
         this.vel.x *= 0.9;
         this.vel.y *= 0.9;
         this.vel.z = 0;
@@ -219,17 +220,39 @@ Ball.prototype.update = function() {
         );
         if (pos.z >= netsHeight) {
           pos.z = netsHeight;
-          this.vel.z = 0;
+          this.vel.z = -this.vel.z;
+          // this.vel.z = 0;
         }
       } else if (pos.z <= netsHeight) {
         pos.z = netsHeight + 1;
-        pos.x += 1;
+        pos.x += 2;
         this.vel.x *= 0.9;
         this.vel.y *= 0.9;
         this.vel.z = 0;
       }
     }
     this.shooting = 0;
+  }
+
+  if ( this.prev.y >= this.stadium.leftGoalArea.top[0].y
+    && this.prev.y <= this.stadium.leftGoalArea.bottom[0].y ) {
+
+    var hit = math.lineCircleCollision(
+      [{ x: this.prev.x, y: this.prev.z }, { x: pos.x, y: pos.z }],
+      { x: this.stadium.leftGoalArea.front[0].x, y: netsHeight }, 9
+    ) || math.lineCircleCollision(
+      [{ x: this.prev.x, y: this.prev.z }, { x: pos.x, y: pos.z }],
+      { x: this.stadium.rightGoalArea.front[0].x, y: netsHeight }, 9
+    );
+
+    if (hit) {
+      var power = (Math.abs(this.vel.x) + Math.abs(this.vel.z)) / 2;
+      this.vel.x = hit.vel.x * power;
+      this.vel.z = hit.vel.y * power;
+      pos.x = hit.pos.x + hit.vel.x;
+      pos.z = hit.pos.y + hit.vel.y;
+      this.shooting = 0;
+    }
   }
 
   this.pos.x = pos.x;
