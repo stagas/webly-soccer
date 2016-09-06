@@ -89,7 +89,7 @@ Player.prototype.maybeShoot = function() {
 Player.prototype.actuallyShoot = function() {
   // console.log('should shoot');
   if (this.collisionWith(this.ball) < 26) {
-    this.shooting = true;
+    this.ball.shoot(this);
   }
 };
 
@@ -120,14 +120,6 @@ Player.prototype.update = function() {
   } else if (col < 26 && col >= 16) {
     this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
     this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
-  }
-
-  if (this.shooting) {
-    var vel = math.angleToCoords(this.angle);
-    this.ball.vel.x = vel.x * 3 * speed;
-    this.ball.vel.y = vel.y * 3 * speed;
-    this.ball.vel.z = 10;
-    this.shooting = false;
   }
 
   var pos = {

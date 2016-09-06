@@ -19,13 +19,57 @@ function Ball(game) {
   this.faceDuration = 4;
   this.faceMap = new Array(this.sprite.length).fill(' ').map((_,i) => i);
   this.randomizeRotate();
+  this.angle = 0;
   this.prev = { x: 500, y: 500 };
 }
+
+Ball.prototype.shoot = function(player) {
+  this.shooting = 20;
+  this.kicker = player;
+  this.angle = this.kicker.angle;
+};
 
 Ball.prototype.update = function() {
   var dir = Math.sign(this.vel.x).toString() + Math.sign(this.vel.y).toString();
   if (dir !== this.dir) this.randomizeRotate();
   this.dir = dir;
+
+  if (this.shooting) {
+    var shotPower = this.kicker.speed;
+    if (this.kicker.vel.x && this.kicker.vel.y) shotPower *= 0.75;
+
+    shotPower = Math.max(0, this.shooting * shotPower * .045);
+    if (this.shooting === 20) shotPower *= 3;
+
+    var angleDiff = Math.abs(Math.atan2(
+      Math.sin(this.kicker.angle-this.angle),
+      Math.cos(this.kicker.angle-this.angle)
+    ));
+
+    var vel = math.angleToCoords(this.kicker.angle);
+
+    if (angleDiff < Math.PI / 4) {
+      this.vel.x += vel.x * shotPower * .4;
+      this.vel.y += vel.y * shotPower * .4;
+      this.vel.z += shotPower * .15;
+    } else if (angleDiff < Math.PI / 2) {
+      this.vel.x += vel.x * shotPower * .2;
+      this.vel.y += vel.y * shotPower * .2;
+      this.vel.z += shotPower * .2;
+    } else {
+      this.vel.x *= 1.07;
+      this.vel.y *= 1.07;
+      this.vel.x += vel.x * shotPower * .2;
+      this.vel.y += vel.y * shotPower * .2;
+      this.vel.z += shotPower * .3;
+    }
+
+    this.shooting--;
+  } else {
+    this.kicker = null;
+  }
+
+  this.angle = Math.atan2(this.vel.y, this.vel.x);
 
   var pos = {
     x: this.prev.x + (this.vel.x > 0 ? Math.min(50, this.vel.x) : Math.max(-50, this.vel.x)),

@@ -23,16 +23,16 @@ Camera.prototype.onresize = function() {
 
 Camera.prototype.update = function() {
   var dx = (
-    ( this.leader.pos.x + this.leader.width * this.leader.scale / 2
-    + this.follower.pos.x + this.follower.width * this.follower.scale / 2
-    ) / 2
+    ( this.leader.pos.x + this.leader.width * this.leader.scale // / 2
+    // + this.follower.pos.x + this.follower.width * this.follower.scale / 2
+    ) // / 2
     - this.size.x / 2
   ) - this.pos.x;
 
   var dy = (
-    ( this.leader.pos.y + this.leader.height * this.leader.scale / 2
-    + this.follower.pos.y + this.follower.height * this.follower.scale / 2
-    ) / 2
+    ( this.leader.pos.y + this.leader.height * this.leader.scale // / 2
+    // + this.follower.pos.y + this.follower.height * this.follower.scale / 2
+    ) // / 2
     - this.size.y / 2
   ) - this.pos.y;
 
