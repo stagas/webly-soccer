@@ -192,9 +192,15 @@ Ball.prototype.update = function() {
           Math.max(pos.y, this.stadium.leftGoalArea.back[0].y + 3),
           this.stadium.leftGoalArea.back[1].y - 7
         );
+        if (pos.z >= netsHeight) {
+          pos.z = netsHeight;
+          this.vel.z = 0;
+        }
       } else if (pos.z <= netsHeight) {
         pos.z = netsHeight + 1;
         pos.x -= 1;
+        this.vel.x *= 0.9;
+        this.vel.y *= 0.9;
         this.vel.z = 0;
       }
     }
@@ -211,9 +217,15 @@ Ball.prototype.update = function() {
           Math.max(pos.y, this.stadium.rightGoalArea.back[0].y + 3),
           this.stadium.rightGoalArea.back[1].y - 7
         );
+        if (pos.z >= netsHeight) {
+          pos.z = netsHeight;
+          this.vel.z = 0;
+        }
       } else if (pos.z <= netsHeight) {
         pos.z = netsHeight + 1;
         pos.x += 1;
+        this.vel.x *= 0.9;
+        this.vel.y *= 0.9;
         this.vel.z = 0;
       }
     }
