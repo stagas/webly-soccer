@@ -14,17 +14,22 @@ var game = {};
 var stadium = game.stadium = new Stadium;
 var ball = game.ball = new Ball(game);
 var player = game.player = new Player(game);
-var camera = game.camera = new Camera(ball);
+var camera = game.camera = new Camera(ball, player);
 
 document.body.appendChild(stadium.el);
 document.body.appendChild(player.el);
 document.body.appendChild(ball.shadow.el);
 document.body.appendChild(ball.el);
 
-ball.prev.x = ball.pos.x = ball.px.x = 400;
-ball.prev.y = ball.pos.y = ball.px.y = 400;
-ball.vel.x = 10;
-ball.vel.y = 10;
+var start = { x: 2300, y: stadium.rightGoalArea.top[0].y-1.5 };
+camera.pos.x = camera.px.x = start.x - camera.size.x / 2;
+camera.pos.y = camera.px.y = start.y - camera.size.y / 2;
+ball.prev.x = ball.pos.x = ball.px.x = start.x;
+ball.prev.y = ball.pos.y = ball.px.y = start.y;
+player.pos.x = player.px.x = start.x - 40;
+player.pos.y = player.px.y = start.y;
+ball.vel.x = 0;
+ball.vel.y = 0;
 ball.vel.z = 0;
 
 /* loop */

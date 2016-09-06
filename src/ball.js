@@ -52,7 +52,7 @@ Ball.prototype.update = function() {
       if (this.prev.y <= pos.y) {
         pos.y -= 6;
       } else {
-        pos.y += 9;
+        pos.y += 1;
       }
       // this.vel.y = 0;
       this.vel.y = -this.vel.y;
@@ -78,7 +78,7 @@ Ball.prototype.update = function() {
       if (this.prev.y <= pos.y) {
         pos.y -= 6;
       } else {
-        pos.y += 9;
+        pos.y += 1;
       }
       // this.vel.y = 0;
       this.vel.y = -this.vel.y;
@@ -110,6 +110,42 @@ Ball.prototype.update = function() {
     // this.vel.x = 0;
     this.vel.x = -this.vel.x;
     this.vel.x *= 0.15;
+  }
+
+  if (this.prev.x <= this.stadium.leftGoalArea.front[0].x) {
+    if ( this.prev.x >= this.stadium.leftGoalArea.back[0].x
+      && this.prev.y >= this.stadium.leftGoalArea.top[0].y
+      && this.prev.y <= this.stadium.leftGoalArea.bottom[0].y ) {
+      pos.x = Math.max(pos.x, this.stadium.leftGoalArea.back[0].x + 7);
+      pos.y = Math.min(
+        Math.max(pos.y, this.stadium.leftGoalArea.back[0].y + 3),
+        this.stadium.leftGoalArea.back[1].y - 7
+      );
+    }
+  }
+
+  if (this.prev.x >= this.stadium.rightGoalArea.front[0].x) {
+    if ( this.prev.x <= this.stadium.rightGoalArea.back[0].x
+      && this.prev.y >= this.stadium.rightGoalArea.top[0].y
+      && this.prev.y <= this.stadium.rightGoalArea.bottom[0].y ) {
+      pos.x = Math.min(pos.x, this.stadium.rightGoalArea.back[0].x + 7);
+      pos.y = Math.min(
+        Math.max(pos.y, this.stadium.rightGoalArea.back[0].y + 3),
+        this.stadium.rightGoalArea.back[1].y - 7
+      );
+    }
+  }
+
+  var hit = math.lineCircleCollision([this.prev, pos], this.stadium.leftGoalArea.top[1], 12)
+    || math.lineCircleCollision([this.prev, pos], this.stadium.leftGoalArea.bottom[1], 12)
+    || math.lineCircleCollision([this.prev, pos], this.stadium.rightGoalArea.top[0], 12)
+    || math.lineCircleCollision([this.prev, pos], this.stadium.rightGoalArea.bottom[0], 12);
+
+  if (hit) {
+    var power = (Math.abs(this.vel.x) + Math.abs(this.vel.y)) / 2
+    this.vel.x = hit.vel.x * power;
+    this.vel.y = hit.vel.y * power;
+    pos.x += ((hit.pos.x + hit.vel.x * 2) - pos.x) * .9;
   }
 
   this.pos.x = pos.x; //this.vel.x > 0 ? Math.min(50, this.vel.x) : Math.max(-50, this.vel.x);

@@ -9,6 +9,7 @@
   "author": "stagas",
   "license": "MIT",
   "dependencies": {
+    "line-circle-collision": "^1.1.3",
     "pixel-art": "^1.1.0",
     "ray-vs-line-segment": "^2.0.0",
     "simple-peer": "^6.0.7"

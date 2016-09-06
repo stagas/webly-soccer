@@ -118,8 +118,8 @@ Player.prototype.update = function() {
     if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
     if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
   } else if (col < 26 && col >= 16) {
-    this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.19;
-    this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.19;
+    this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
+    this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
   }
 
   if (this.shooting) {
@@ -135,65 +135,61 @@ Player.prototype.update = function() {
     y: this.pos.y + (this.vel.y * speed | 0)
   };
 
-  var point;
-
-  point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.top);
-  if (point) {
-    pos.y = point.y;
-    if (this.pos.y >= pos.y) {
-      pos.y += 11;
-    } else {
-      pos.y -= 4;
-    }
-  } else {
-    point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.bottom);
-    if (point) {
-      pos.y = point.y;
-      if (this.pos.y <= pos.y) {
-        pos.y -= 6;
-      } else {
-        pos.y += 9;
+  if (this.pos.x <= this.stadium.leftGoalArea.front[0].x) {
+    if ( this.pos.x >= this.stadium.leftGoalArea.back[0].x
+      && this.pos.y >= this.stadium.leftGoalArea.top[0].y
+      && this.pos.y <= this.stadium.leftGoalArea.bottom[0].y ) {
+      pos.x = Math.max(
+          pos.x, this.stadium.leftGoalArea.back[0].x + 11
+        +(pos.y < this.stadium.leftGoalArea.top[0].y + 12 ? 6 : 0)
+      );
+      pos.y = Math.min(
+        Math.max(pos.y, this.stadium.leftGoalArea.back[0].y + 12),
+        this.stadium.leftGoalArea.back[1].y - 7
+      );
+    } else if (
+      this.pos.x < this.stadium.leftGoalArea.back[0].x
+      && pos.x >= this.stadium.leftGoalArea.back[0].x
+      && pos.y >= this.stadium.leftGoalArea.top[0].y
+      && pos.y <= this.stadium.leftGoalArea.bottom[0].y ) {
+      pos.x = Math.min(pos.x, this.stadium.leftGoalArea.back[0].x - 13);
+    } else if (this.pos.x >= this.stadium.leftGoalArea.back[0].x) {
+      if ( this.pos.y < this.stadium.leftGoalArea.top[0].y
+        && pos.y >= this.stadium.leftGoalArea.top[0].y ) {
+        pos.y = Math.min(pos.y, this.stadium.leftGoalArea.top[0].y - 4);
+      } else if ( this.pos.y > this.stadium.leftGoalArea.bottom[0].y
+        && pos.y <= this.stadium.leftGoalArea.bottom[0].y ) {
+        pos.y = Math.max(pos.y, this.stadium.leftGoalArea.bottom[0].y + 4);
       }
     }
   }
 
-  point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.top);
-  if (point) {
-    pos.y = point.y;
-    if (this.pos.y >= pos.y) {
-      pos.y += 11;
-    } else {
-      pos.y -= 4;
-    }
-  } else {
-    point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.bottom);
-    if (point) {
-      pos.y = point.y;
-      if (this.pos.y <= pos.y) {
-        pos.y -= 6;
-      } else {
-        pos.y += 9;
+  if (this.pos.x >= this.stadium.rightGoalArea.front[0].x) {
+    if ( this.pos.x <= this.stadium.rightGoalArea.back[0].x
+      && this.pos.y >= this.stadium.rightGoalArea.top[0].y
+      && this.pos.y <= this.stadium.rightGoalArea.bottom[0].y ) {
+      pos.x = Math.min(
+          pos.x, this.stadium.rightGoalArea.back[0].x - 11
+        -(pos.y < this.stadium.rightGoalArea.top[0].y + 12 ? 6 : 0)
+      );
+      pos.y = Math.min(
+        Math.max(pos.y, this.stadium.rightGoalArea.back[0].y + 12),
+        this.stadium.rightGoalArea.back[1].y - 7
+      );
+    } else if (
+      this.pos.x > this.stadium.rightGoalArea.back[0].x
+      && pos.x <= this.stadium.rightGoalArea.back[0].x
+      && pos.y >= this.stadium.rightGoalArea.top[0].y
+      && pos.y <= this.stadium.rightGoalArea.bottom[0].y ) {
+      pos.x = Math.max(pos.x, this.stadium.rightGoalArea.back[0].x + 10);
+    } else if (this.pos.x <= this.stadium.rightGoalArea.back[0].x) {
+      if ( this.pos.y < this.stadium.rightGoalArea.top[0].y
+        && pos.y >= this.stadium.rightGoalArea.top[0].y ) {
+        pos.y = Math.min(pos.y, this.stadium.rightGoalArea.top[0].y - 4);
+      } else if ( this.pos.y > this.stadium.rightGoalArea.bottom[0].y
+        && pos.y <= this.stadium.rightGoalArea.bottom[0].y ) {
+        pos.y = Math.max(pos.y, this.stadium.rightGoalArea.bottom[0].y + 4);
       }
-    }
-  }
-
-  point = math.rayLineIntersect([this.pos, pos], this.stadium.leftGoalArea.back);
-  if (point) {
-    pos.x = point.x;
-    if (this.pos.x >= pos.x) {
-      pos.x += 7;
-    } else {
-      pos.x -= 8;
-    }
-  }
-
-  point = math.rayLineIntersect([this.pos, pos], this.stadium.rightGoalArea.back);
-  if (point) {
-    pos.x = point.x;
-    if (this.pos.x > pos.x) {
-      pos.x += 7;
-    } else {
-      pos.x -= 8;
     }
   }
 

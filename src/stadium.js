@@ -1,4 +1,5 @@
 var css = require('../style.css');
+var draw = require('../lib/draw');
 var sprite = require('./sprite');
 
 module.exports = Stadium;
@@ -24,24 +25,39 @@ function Stadium() {
   this.debugCanvas.width = '2754';
   this.debugCanvas.height = '1700';
   this.debugCanvas.style.zIndex = 10000;
+
   // this.el.appendChild(this.debugCanvas);
-  var ctx = this.debugCanvas.getContext('2d');
-  ctx.strokeStyle = '#f00';
-  ctx.rect(246, 785, 303 - 246, 924 - 785);
-  ctx.rect(2457, 785, 303 - 246, 924 - 785);
-  ctx.stroke();
+  // var ctx = this.debugCanvas.getContext('2d');
+  // ctx.strokeStyle = '#f00';
+  // ctx.rect(246, 785, 303 - 246, 924 - 785);
+  // ctx.rect(2457, 785, 303 - 246, 924 - 785);
+  // ctx.stroke();
 
   this.leftGoalArea = {
-    top: [{ x: 233, y: 785 }, { x: 303, y: 785 }],
-    bottom: [{ x: 233, y: 925 }, { x: 303, y: 925 }],
-    back: [{ x: 247, y: 780 }, { x: 247, y: 929 }],
+    top: [{ x: 246, y: 785 }, { x: 303, y: 785 }],
+    bottom: [{ x: 246, y: 924 }, { x: 303, y: 924 }],
+    back: [{ x: 247, y: 784 }, { x: 247, y: 926 }],
+    front: [{ x: 303, y: 784 }, { x: 303, y: 926 }],
   };
 
   this.rightGoalArea = {
-    top: [{ x: 2457, y: 785 }, { x: 2525, y: 785 }],
-    bottom: [{ x: 2457, y: 925 }, { x: 2525, y: 925 }],
-    back: [{ x: 2512, y: 781 }, { x: 2512, y: 928 }],
+    top: [{ x: 2457, y: 785 }, { x: 2513, y: 785 }],
+    bottom: [{ x: 2457, y: 924 }, { x: 2513, y: 924 }],
+    back: [{ x: 2513, y: 784 }, { x: 2513, y: 926 }],
+    front: [{ x: 2457, y: 784 }, { x: 2457, y: 926 }],
   };
+
+  draw.line(this.debugCanvas, this.leftGoalArea.top);
+  draw.line(this.debugCanvas, this.leftGoalArea.back);
+  draw.line(this.debugCanvas, this.leftGoalArea.front);
+  draw.line(this.debugCanvas, this.leftGoalArea.bottom);
+
+  draw.line(this.debugCanvas, this.rightGoalArea.top);
+  draw.line(this.debugCanvas, this.rightGoalArea.back);
+  draw.line(this.debugCanvas, this.rightGoalArea.front);
+  draw.line(this.debugCanvas, this.rightGoalArea.bottom);
+
+  draw.circle(this.debugCanvas, this.rightGoalArea.top[0], 3);
 
   var grass = createGrass();
   this.el.style.background = 'url(' + grass.toDataURL() + ') -60px 0px';

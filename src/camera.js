@@ -1,9 +1,11 @@
+var math = require('../lib/math');
 var Point = require('../lib/point');
 
 module.exports = Camera;
 
-function Camera(leader) {
+function Camera(leader, follower) {
   this.leader = leader;
+  this.follower = follower
   this.speed = 0.14;
   this.friction = 0.55;
   this.px = new Point;
@@ -20,8 +22,19 @@ Camera.prototype.onresize = function() {
 };
 
 Camera.prototype.update = function() {
-  var dx = (this.leader.pos.x + this.leader.width * this.leader.scale / 2 - this.size.x / 2) - this.pos.x;
-  var dy = (this.leader.pos.y + this.leader.height * this.leader.scale / 2 - this.size.y / 2) - this.pos.y;
+  var dx = (
+    ( this.leader.pos.x + this.leader.width * this.leader.scale / 2
+    + this.follower.pos.x + this.follower.width * this.follower.scale / 2
+    ) / 2
+    - this.size.x / 2
+  ) - this.pos.x;
+
+  var dy = (
+    ( this.leader.pos.y + this.leader.height * this.leader.scale / 2
+    + this.follower.pos.y + this.follower.height * this.follower.scale / 2
+    ) / 2
+    - this.size.y / 2
+  ) - this.pos.y;
 
   if (Math.abs(dx) < 1) dx = 0;
   if (Math.abs(dy) < 1) dy = 0;
