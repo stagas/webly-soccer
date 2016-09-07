@@ -1,5 +1,6 @@
 var css = require('../style.css');
 var math = require('../lib/math');
+var Point = require('../lib/point');
 var sprite = require('./sprite');
 
 module.exports = Player;
@@ -8,6 +9,7 @@ function Player(game, data) {
   data = data || {};
 
   this.game = game;
+  this.number = data.number || 0;
 
   this.colors = data.colors || {
     't': `rgb(${Math.random() * 256 | 0}, ${Math.random() * 256 | 0}, ${Math.random() * 256 | 0})`,
@@ -111,8 +113,12 @@ Player.prototype.update = function() {
   }
 
   this.face = this.faceMap[this.vel];
+
+  var angleToBall = Math.atan2(this.ball.pos.y - this.pos.y, this.ball.pos.x - this.pos.x);
+  var lookAtBall = new Point({ x: Math.round(Math.cos(angleToBall)), y: Math.round(Math.sin(angleToBall)) });
+  //if (this.number === 0) console.log(lookAtBall);
   this.faceStandMap['0,0'] =
-  this.faceMap['0,0'] = this.faceStandMap[this.vel];
+  this.faceMap['0,0'] = this.faceStandMap[lookAtBall];
 
   var speed = this.speed;
   if (this.vel.x && this.vel.y) speed *= 0.75;
