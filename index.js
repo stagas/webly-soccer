@@ -3,7 +3,8 @@ var Loop = require('./lib/loop');
 var arrows = require('./lib/arrows');
 var Stadium = require('./src/stadium');
 var Camera = require('./src/camera');
-var Player = require('./src/player');
+// var Player = require('./src/player');
+var Team = require('./src/team');
 var Ball = require('./src/ball');
 var connect = require('./src/network');
 
@@ -13,11 +14,11 @@ var game = {};
 
 var stadium = game.stadium = new Stadium;
 var ball = game.ball = new Ball(game);
-var player = game.player = new Player(game);
-var camera = game.camera = new Camera(ball, player);
+var team = game.team = new Team(game);
+var camera = game.camera = new Camera(ball, team.master);
 
 document.body.appendChild(stadium.el);
-document.body.appendChild(player.el);
+document.body.appendChild(team.el);
 document.body.appendChild(ball.shadow.el);
 document.body.appendChild(ball.el);
 
@@ -27,8 +28,8 @@ camera.pos.y = camera.px.y = start.y - camera.size.y / 2;
 ball.prev.x = ball.pos.x = ball.px.x = start.x;
 ball.prev.y = ball.pos.y = ball.px.y = start.y;
 ball.prev.z = ball.pos.z = ball.px.z = start.z;
-player.pos.x = player.px.x = start.x + 40;
-player.pos.y = player.px.y = start.y + 100;
+// player.pos.x = player.px.x = start.x + 40;
+// player.pos.y = player.px.y = start.y + 100;
 ball.vel.x = -2.28;
 ball.vel.y = 0;
 ball.vel.z = 0;
@@ -41,10 +42,10 @@ var prevTime = Date.now();
 var prevKeys = +keys;
 
 loop.on('update', (dt, alpha, frame) => {
-  controls(keys, player);
+  controls(keys, team.master);
 
-  if (opponent.player) {
-    controls(opponent.keys, opponent.player);
+  if (opponent.team) {
+    controls(opponent.keys, opponent.team);
   }
 
   update(frame);
@@ -53,8 +54,8 @@ loop.on('update', (dt, alpha, frame) => {
     if (+keys !== +prevKeys || Date.now() - prevTime > 1000) {
       var packet = JSON.stringify({
         keys: +keys,
-        pos: player.pos,
-        vel: player.vel,
+        pos: team.master.pos,
+        vel: team.master.vel,
         ball: {
           pos: ball.pos,
           vel: ball.vel
@@ -75,15 +76,15 @@ loop.on('render', render);
 loop.tps(14).start();
 
 function update() {
-  player.update();
-  if (opponent.player) opponent.player.update();
+  team.update();
+  if (opponent.team) opponent.team.update();
   ball.update();
   camera.update();
 }
 
 function render(dt, alpha, frame, elapsed) {
-  player.render(dt, alpha);
-  if (opponent.player) opponent.player.render(dt, alpha);
+  team.render(dt, alpha);
+  if (opponent.team) opponent.team.render(dt, alpha);
   ball.render(dt, alpha);
   camera.render(dt, alpha);
 }
@@ -98,7 +99,7 @@ function controls(k, player) {
 }
 
 function onkeys(k) {
-  k & keys.shoot ? player.shoot() : player.shootEnd();
+  k & keys.shoot ? team.master.shoot() : team.master.shootEnd();
 }
 
 /* network */
@@ -109,45 +110,45 @@ var opponent = {
 
 var showFrame;
 
-connect(
-  peer => {
-    opponent.socket = peer;
-    // showFrame = setInterval(() => console.log(loop.frame), 1000);
-    peer.send(JSON.stringify({
-      colors: player.colors,
-      pos: player.pos,
-      vel: player.vel,
-      keys: keys
-    }));
-  },
-  message => {
-    var json = new TextDecoder('utf-8').decode(message);
-    var data = JSON.parse(json);
-    if (data.colors) {
-      opponent.player = new Player(game, data);
-      opponent.keys = data.keys;
+// connect(
+//   peer => {
+//     opponent.socket = peer;
+//     // showFrame = setInterval(() => console.log(loop.frame), 1000);
+//     peer.send(JSON.stringify({
+//       colors: team.colors,
+//       pos: team.master.pos,
+//       vel: team.master.vel,
+//       keys: keys
+//     }));
+//   },
+//   message => {
+//     var json = new TextDecoder('utf-8').decode(message);
+//     var data = JSON.parse(json);
+//     if (data.colors) {
+//       opponent.team = new Player(game, data);
+//       opponent.keys = data.keys;
 
-      document.body.appendChild(opponent.player.el);
-      console.log('created opponent')
-    } else if (data.pos) {
-      opponent.keys = data.keys;
-      opponent.player.pos.x = data.pos.x;
-      opponent.player.pos.y = data.pos.y;
-      opponent.player.vel.x = data.vel.x;
-      opponent.player.vel.y = data.vel.y;
-      if (opponent.player.collisionWith(data.ball) < 26) {
-        ball.pos.x = data.ball.pos.x;
-        ball.pos.y = data.ball.pos.y;
-        ball.vel.x = data.ball.vel.x;
-        ball.vel.y = data.ball.vel.y;
-        ball.vel.z = data.ball.vel.z;
-      }
-    }
-  },
-  peer => {
-    // clearInterval(showFrame);
-    if (opponent.player) document.body.removeChild(opponent.player.el);
-    opponent.player = null;
-    opponent.socket = null;
-  }
-);
+//       document.body.appendChild(opponent.team.el);
+//       console.log('created opponent')
+//     } else if (data.pos) {
+//       opponent.keys = data.keys;
+//       opponent.team.pos.x = data.pos.x;
+//       opponent.team.pos.y = data.pos.y;
+//       opponent.team.vel.x = data.vel.x;
+//       opponent.team.vel.y = data.vel.y;
+//       if (opponent.team.collisionWith(data.ball) < 26) {
+//         ball.pos.x = data.ball.pos.x;
+//         ball.pos.y = data.ball.pos.y;
+//         ball.vel.x = data.ball.vel.x;
+//         ball.vel.y = data.ball.vel.y;
+//         ball.vel.z = data.ball.vel.z;
+//       }
+//     }
+//   },
+//   peer => {
+//     // clearInterval(showFrame);
+//     if (opponent.team) document.body.removeChild(opponent.team.el);
+//     opponent.team = null;
+//     opponent.socket = null;
+//   }
+// );

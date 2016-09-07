@@ -5,9 +5,19 @@ var sprite = require('./sprite');
 module.exports = Stadium;
 
 function Stadium() {
+  this.size = {
+    x: 2154,
+    y: 1100
+  };
+
+  this.offset = {
+    x: 300,
+    y: 300
+  };
+
   this.area = [
     { x: 300, y: 300 },
-    { x: 2154 + 300, y: 1100 + 300 }
+    { x: this.size.x + 300, y: this.size.y + 300 }
   ];
 
   var boundsMargin = 90;

@@ -58,6 +58,11 @@ function Player(game, data) {
   };
 }
 
+Player.prototype.setPosition = function(pos) {
+  this.pos.x = this.px.x = pos.x + this.game.stadium.offset.x;
+  this.pos.y = this.px.y = pos.y + this.game.stadium.offset.y;
+};
+
 Player.prototype.move = function(x, y){
   this.vel.x |= x;
   this.vel.y |= y;
