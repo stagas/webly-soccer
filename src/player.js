@@ -9,6 +9,7 @@ function Player(game, data) {
   data = data || {};
 
   this.game = game;
+  this.team = data.team;
   this.number = data.number || 0;
 
   this.colors = data.colors || {
@@ -83,6 +84,7 @@ Player.prototype.shootEnd = function() {
 };
 
 Player.prototype.pass = function() {
+  this.team.pass();
   // console.log('should pass');
 };
 
@@ -95,41 +97,55 @@ Player.prototype.maybeShoot = function() {
 
 Player.prototype.actuallyShoot = function() {
   // console.log('should shoot');
-  if (this.collisionWith(this.ball) < 26) {
+  if (this.distanceToBall < 26) {
     this.ball.shoot(this);
   }
 };
 
-Player.prototype.collisionWith = function(target) {
-  var dx = this.pos.x - target.pos.x
-  var dy = this.pos.y - target.pos.y
+Player.prototype.getDistanceToBall = function() {
+  var dx = this.pos.x - this.game.ball.pos.x;
+  var dy = this.pos.y - this.game.ball.pos.y;
   var dist = Math.sqrt(dx*dx + dy*dy);
   return dist;
 };
 
 Player.prototype.update = function() {
+  this.distanceToBall = this.getDistanceToBall();
+  this.angleToBall = Math.atan2(this.ball.pos.y - this.pos.y, this.ball.pos.x - this.pos.x);
+  this.velToBall = new Point({
+    x: Math.cos(this.angleToBall),
+    y: Math.sin(this.angleToBall)
+  });
+  this.faceStandMap['0,0'] = this.faceMap['0,0'] = this.faceStandMap[this.velToBall.round()];
+
+  var speed = this.speed;
+  if (this.vel.x && this.vel.y) speed *= 0.75;
+
+  // ai: go to ball
+  if (!this.master) {
+    if (this.distanceToBall < 200) {
+      if (this.distanceToBall > 80 || this === this.team.closestToBall) {
+        var velToBall = this.velToBall.round();
+        this.vel.x = velToBall.x;
+        this.vel.y = velToBall.y;
+      }
+    }
+  }
+
   if (this.vel.x || this.vel.y) {
     this.angle = Math.atan2(this.vel.y, this.vel.x);
   }
 
   this.face = this.faceMap[this.vel];
 
-  var angleToBall = Math.atan2(this.ball.pos.y - this.pos.y, this.ball.pos.x - this.pos.x);
-  var lookAtBall = new Point({ x: Math.round(Math.cos(angleToBall)), y: Math.round(Math.sin(angleToBall)) });
-  //if (this.number === 0) console.log(lookAtBall);
-  this.faceStandMap['0,0'] =
-  this.faceMap['0,0'] = this.faceStandMap[lookAtBall];
-
-  var speed = this.speed;
-  if (this.vel.x && this.vel.y) speed *= 0.75;
-
+  // ball collision
   if (this.ball.pos.z <= this.pos.z + 12 * this.scale) {
-    var col = this.collisionWith(this.ball);
-    if (col < 16) {
+    if (this.distanceToBall < 16) {
+      this.team.setMaster(this);
       var rand = 0.85 + Math.random() * 0.46;
       if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
       if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
-    } else if (col < 26 && col >= 16) {
+    } else if (this.distanceToBall < 26 && this.distanceToBall >= 16) {
       this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
       this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
     }

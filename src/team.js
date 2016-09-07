@@ -1,3 +1,4 @@
+var css = require('../style.css');
 var Player = require('./player');
 
 module.exports = Team;
@@ -8,7 +9,8 @@ function Team(game, data) {
   this.game = game;
   this.colors = data.colors || this.randomColors();
   this.createPlayers();
-  this.master = this.players[0];
+  this.master = null;
+  this.setMaster(this.players[0]);
   this.setFormation(data.formation || '4-4-2');
   this.placeFormation();
 }
@@ -16,10 +18,37 @@ function Team(game, data) {
 Team.prototype.createPlayers = function() {
   this.players = [];
   for (var i = 0; i < 11; i++) {
-    var player = new Player(this.game, { colors: this.colors, number: i });
+    var player = new Player(this.game, { team: this, colors: this.colors, number: i });
     this.players.push(player);
     this.el.appendChild(player.el);
   }
+};
+
+Team.prototype.pass = function() {
+  var closest = this.getClosestToBall(this.master);
+  var vel = closest.velToBall.inverse();
+  this.game.ball.vel.x = vel.x * closest.distanceToBall * .1;
+  this.game.ball.vel.y = vel.y * closest.distanceToBall * .1;
+};
+
+Team.prototype.getClosestToBall = function(exclude) {
+  return this.players.reduce((p, n) => {
+    if (p.distanceToBall < n.distanceToBall && p !== exclude) {
+      return p;
+    } else {
+      return n;
+    }
+  }, exclude === this.players[0] ? this.players[1] : this.players[0]);
+};
+
+Team.prototype.setMaster = function(player) {
+  if (this.master) {
+    this.master.master = false;
+    this.master.el.classList.remove(css.master);
+  }
+  this.master = player;
+  this.master.el.classList.add(css.master);
+  this.master.master = true;
 };
 
 Team.prototype.setFormation = function(formation) {
@@ -50,6 +79,8 @@ Team.prototype.randomColors = function() {
 };
 
 Team.prototype.update = function() {
+  this.closestToBall = this.getClosestToBall();
+  this.setMaster(this.closestToBall);
   this.players.forEach(player => player.update());
 };
 

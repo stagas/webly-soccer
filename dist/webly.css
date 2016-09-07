@@ -42,6 +42,18 @@ body {
   margin-top: -39px;
 }
 
+._style__player._style__master:before {
+  content: ' ';
+  position: absolute;
+  width: 9px;
+  height: 2px;
+  background: yellow;
+  top: -10px;
+  left: 50%;
+  margin-left: -4px;
+  z-index: 10000;
+}
+
 ._style__ball,
 ._style__ball-shadow {
   margin-left: -5px;
