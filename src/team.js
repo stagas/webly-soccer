@@ -32,8 +32,8 @@ Team.prototype.pass = function() {
   if (!closest) closest = this.getPlayerClosestToBall(this.master);
   var vel = closest.velToBall.inverse();
   this.ball.pass(this.master, closest);
-  this.ball.vel.x = vel.x * closest.distanceToBall * .2;
-  this.ball.vel.y = vel.y * closest.distanceToBall * .2;
+  this.ball.vel.x = vel.x * closest.distanceToBall * .1;
+  this.ball.vel.y = vel.y * closest.distanceToBall * .1;
 };
 
 Team.prototype.getPlayerInFront = function() {
@@ -95,6 +95,7 @@ Team.prototype.randomColors = function() {
 };
 
 Team.prototype.update = function() {
+  this.closestToBall = this.getPlayerClosestToBall();
   this.players.forEach(player => player.update());
 };
 

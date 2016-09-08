@@ -88,36 +88,27 @@ Player.prototype.move = function(x, y){
 
 Player.prototype.shoot = function() {
   this.shootTimer++;
+  return true;
 };
 
 Player.prototype.shootEnd = function() {
-  if (this.shootTimer) {
-    this.pass();
-    this.shootTimer = 0;
-  }
+  if (this.shootTimer) this.pass();
 };
 
 Player.prototype.pass = function() {
-  if (this.distanceToBall < this.touchBallDistance) {
-    this.team.pass();
-  }
-  // console.log('should pass');
+  this.team.pass();
+  this.shootTimer = 0;
+  return true;
 };
 
-Player.prototype.maybeShoot = function() {
-  if (this.shootTimer > 4) {
-    this.actuallyShoot();
-    this.shootTimer = 0;
-    return true;
-  }
-  return false;
+Player.prototype.isPastShootThreshold = function() {
+  return this.shootTimer > 4;
 };
 
 Player.prototype.actuallyShoot = function() {
-  // console.log('should shoot');
-  if (this.distanceToBall < this.nearBallDistance) {
-    this.ball.shoot(this);
-  }
+  this.ball.shoot(this);
+  this.shootTimer = 0;
+  return true;
 };
 
 Player.prototype.isRunning = function() {
@@ -125,7 +116,7 @@ Player.prototype.isRunning = function() {
 };
 
 Player.prototype.isTeamOwner = function() {
-  return this.ball.owner.team === this.team;
+  return this.ball.owner ? this.ball.owner.team === this.team : false;
 };
 
 Player.prototype.isBallOwner = function() {
@@ -180,21 +171,22 @@ Player.prototype.makeMaster = function() {
 
 Player.prototype.makeBallOwner = function() {
   this.ball.owner = this;
+  this.ball.passing = false;
   this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.8;
   this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.8;
   return true;
 };
 
 Player.prototype.dribbleBall = function() {
-  var rand = 0.86 + Math.random() * 0.56;
+  var rand = 0.86 + Math.random() * 0.46;
   this.ball.vel.x = this.vel.x * this.velSpeed * rand;
   this.ball.vel.y = this.vel.y * this.velSpeed * rand;
   return true;
 };
 
 Player.prototype.attractBall = function() {
-  this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.17;
-  this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.17;
+  this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.10;
+  this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.10;
   return true;
 };
 
@@ -222,12 +214,32 @@ Player.prototype.makeBehaviors = function() {
   var p = this;
   var _ = behavior;
   var not = _.not;
+  var repeat = _.repeat;
+
+  this.maybeShoot =
+    _.sequence([
+      p.isBallOwner,
+      p.isTouchingBall,
+      p.shoot,
+      p.isPastShootThreshold,
+      p.actuallyShoot,
+    ]);
+
+  // this.maybeGoBack =
+  //   _.sequence([
+  //     not(p.isMaster),
+  //     repeat(_.sequence([
+  //       not(p.isInFormation),
+  //       p.runToFormation,
+  //     ])),
+  //     p.stop,
+  //   ]);
 
   this.maybeRunToBall =
     _.sequence([
       not(p.isMaster),
 
-      p.isNearBall,
+      p.isClosestToBall,
       p.runToBall,
 
       p.isTeamOwner,
@@ -245,23 +257,27 @@ Player.prototype.makeBehaviors = function() {
       p.attractBall,
       p.makeMaster,
 
-      p.isDribblingBall,
+      not(p.isBallKicker),
 
       _.select([
         _.sequence([
           not(p.isBallOwner),
           p.makeBallOwner,
+          p.dribbleBall,
         ]),
 
-        p.dribbleBall,
+        _.sequence([
+          p.isDribblingBall,
+          p.dribbleBall,
+        ]),
       ]),
     ]);
 };
 
 Player.prototype.updateBehaviors = function() {
   this.maybeDribble();
+  // this.maybeGoBack();
   this.maybeRunToBall();
-  this.maybeShoot();
 };
 
 Player.prototype.updateCollisions = function() {
@@ -380,8 +396,8 @@ Player.prototype.renderDraw = function() {
 };
 
 Player.prototype.update = function() {
-  this.updateBehaviors();
   this.updatePhysics();
+  this.updateBehaviors();
   this.updateCollisions();
 };
 

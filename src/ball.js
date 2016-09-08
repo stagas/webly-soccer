@@ -39,12 +39,14 @@ Ball.prototype.shoot = function(player) {
   this.shooting = this.shotDuration;
   this.kicker = player;
   this.angle = this.kicker.angle;
+  this.owner = null;
 };
 
 Ball.prototype.pass = function(player) {
   this.passing = true;
   this.shooting = this.passDuration;
   this.kicker = player;
+  this.owner = null;
 };
 
 Ball.prototype.updateCollisions = function() {

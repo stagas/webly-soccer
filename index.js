@@ -95,11 +95,11 @@ function controls(k, player) {
   k & keys.up    && player.move(0,-1);
   k & keys.right && player.move(1,0);
   k & keys.down  && player.move(0,1);
-  k & keys.shoot ? player.shoot() : player.shootEnd();
+  k & keys.shoot ? player.maybeShoot() : player.shootEnd();
 }
 
 function onkeys(k) {
-  k & keys.shoot ? team.master.shoot() : team.master.shootEnd();
+  k & keys.shoot ? team.master.maybeShoot() : team.master.shootEnd();
 }
 
 /* network */
