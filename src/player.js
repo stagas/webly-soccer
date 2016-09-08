@@ -29,6 +29,8 @@ function Player(game, data) {
   this.stadium = this.game.stadium;
   this.ball = this.game.ball;
 
+  this.nearBall = 26;
+  this.touchBall = 16;
   this.speed = 19;
   this.shootTimer = 0;
   this.angle = 0;
@@ -73,7 +75,6 @@ Player.prototype.move = function(x, y){
 
 Player.prototype.shoot = function() {
   this.shootTimer++;
-  this.maybeShoot();
 };
 
 Player.prototype.shootEnd = function() {
@@ -84,7 +85,9 @@ Player.prototype.shootEnd = function() {
 };
 
 Player.prototype.pass = function() {
-  this.team.pass();
+  if (this.distanceToBall < this.nearBall) {
+    this.team.pass();
+  }
   // console.log('should pass');
 };
 
@@ -97,25 +100,15 @@ Player.prototype.maybeShoot = function() {
 
 Player.prototype.actuallyShoot = function() {
   // console.log('should shoot');
-  if (this.distanceToBall < 26) {
+  if (this.distanceToBall < this.nearBall) {
     this.ball.shoot(this);
   }
 };
 
-Player.prototype.getDistanceToBall = function() {
-  var dx = this.pos.x - this.game.ball.pos.x;
-  var dy = this.pos.y - this.game.ball.pos.y;
-  var dist = Math.sqrt(dx*dx + dy*dy);
-  return dist;
-};
-
 Player.prototype.update = function() {
-  this.distanceToBall = this.getDistanceToBall();
-  this.angleToBall = Math.atan2(this.ball.pos.y - this.pos.y, this.ball.pos.x - this.pos.x);
-  this.velToBall = new Point({
-    x: Math.cos(this.angleToBall),
-    y: Math.sin(this.angleToBall)
-  });
+  this.distanceToBall = math.distanceTo(this.ball, this);
+  this.angleToBall = math.angleTo(this.ball, this);
+  this.velToBall = math.angleToPoint(this.angleToBall);
   this.faceStandMap['0,0'] = this.faceMap['0,0'] = this.faceStandMap[this.velToBall.round()];
 
   var speed = this.speed;
@@ -133,19 +126,19 @@ Player.prototype.update = function() {
   }
 
   if (this.vel.x || this.vel.y) {
-    this.angle = Math.atan2(this.vel.y, this.vel.x);
+    this.angle = math.pointToAngle(this.vel);
   }
 
   this.face = this.faceMap[this.vel];
 
   // ball collision
   if (this.ball.pos.z <= this.pos.z + 12 * this.scale) {
-    if (this.distanceToBall < 16) {
-      this.team.setMaster(this);
+    if (this.distanceToBall < this.touchBall) {
+      // this.team.setMaster(this);
       var rand = 0.85 + Math.random() * 0.46;
       if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
       if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
-    } else if (this.distanceToBall < 26 && this.distanceToBall >= 16) {
+    } else if (this.distanceToBall < this.nearBall && this.distanceToBall >= this.touchBall) {
       this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
       this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
     }
@@ -219,6 +212,8 @@ Player.prototype.update = function() {
 
   this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(this.pos.x, this.stadium.bounds[0].x));
   this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(this.pos.y, this.stadium.bounds[0].y));
+
+  this.maybeShoot();
 };
 
 Player.prototype.render = function(dt, alpha) {

@@ -31,14 +31,11 @@ Team.prototype.pass = function() {
   this.game.ball.vel.y = vel.y * closest.distanceToBall * .1;
 };
 
-Team.prototype.getClosestToBall = function(exclude) {
-  return this.players.reduce((p, n) => {
-    if (p.distanceToBall < n.distanceToBall && p !== exclude) {
-      return p;
-    } else {
-      return n;
-    }
-  }, exclude === this.players[0] ? this.players[1] : this.players[0]);
+Team.prototype.getClosestToBall = function(ref) {
+  return this.players
+    .slice()
+    .filter(player => player !== ref)
+    .sort((a, b) => a.distanceToBall - b.distanceToBall)[0];
 };
 
 Team.prototype.setMaster = function(player) {
@@ -79,8 +76,6 @@ Team.prototype.randomColors = function() {
 };
 
 Team.prototype.update = function() {
-  this.closestToBall = this.getClosestToBall();
-  this.setMaster(this.closestToBall);
   this.players.forEach(player => player.update());
 };
 

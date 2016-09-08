@@ -690,9 +690,9 @@ sprite.create = function createSprite(name, palette) {
   return merge({
     el: div,
     px: new Point,
-    angle: 0,
     pos: new Point,
     vel: new Point,
+    angle: 0,
     sprite: s,
   }, s);
 };
