@@ -1,6 +1,7 @@
 var css = require('../style.css');
 var math = require('../lib/math');
 var Point = require('../lib/point');
+var behavior = require('../lib/behavior-tree');
 var sprite = require('./sprite');
 
 module.exports = Player;
@@ -29,13 +30,18 @@ function Player(game, data) {
   this.stadium = this.game.stadium;
   this.ball = this.game.ball;
 
-  this.nearBall = 26;
-  this.touchBall = 16;
+  this.nearBallDistance = 200;
+  this.veryNearBallDistance = 120;
+  this.touchBallDistance = 26;
+  this.dribbleBallDistance = 16;
+  this.formationInDistance = 400;
+
   this.speed = 19;
   this.shootTimer = 0;
   this.angle = 0;
 
   this.face = 'stand_down';
+  this.facePos = new Point;
   this.faceDuration = 4;
   this.faceIndex = 0;
   this.faceNeedle = 0;
@@ -61,11 +67,18 @@ function Player(game, data) {
     '-1,1': 'stand_down_left',
     '1,1': 'stand_down_right',
   };
+
+  this.makeBehaviors();
 }
 
 Player.prototype.setPosition = function(pos) {
   this.pos.x = this.px.x = pos.x + this.game.stadium.offset.x;
   this.pos.y = this.px.y = pos.y + this.game.stadium.offset.y;
+};
+
+Player.prototype.setFormation = function(pos) {
+  this.formation = { pos: pos };
+  this.setPosition(this.formation.pos);
 };
 
 Player.prototype.move = function(x, y){
@@ -85,7 +98,7 @@ Player.prototype.shootEnd = function() {
 };
 
 Player.prototype.pass = function() {
-  if (this.distanceToBall < this.nearBall) {
+  if (this.distanceToBall < this.touchBallDistance) {
     this.team.pass();
   }
   // console.log('should pass');
@@ -95,59 +108,164 @@ Player.prototype.maybeShoot = function() {
   if (this.shootTimer > 4) {
     this.actuallyShoot();
     this.shootTimer = 0;
+    return true;
   }
+  return false;
 };
 
 Player.prototype.actuallyShoot = function() {
   // console.log('should shoot');
-  if (this.distanceToBall < this.nearBall) {
+  if (this.distanceToBall < this.nearBallDistance) {
     this.ball.shoot(this);
   }
 };
 
-Player.prototype.update = function() {
-  this.distanceToBall = math.distanceTo(this.ball, this);
-  this.angleToBall = math.angleTo(this.ball, this);
-  this.velToBall = math.angleToPoint(this.angleToBall);
-  this.faceStandMap['0,0'] = this.faceMap['0,0'] = this.faceStandMap[this.velToBall.round()];
+Player.prototype.isRunning = function() {
+  return this.vel.x || this.vel.y;
+};
 
-  var speed = this.speed;
-  if (this.vel.x && this.vel.y) speed *= 0.75;
+Player.prototype.isTeamOwner = function() {
+  return this.ball.owner.team === this.team;
+};
 
-  // ai: go to ball
-  if (!this.master) {
-    if (this.distanceToBall < 200) {
-      if (this.distanceToBall > 80 || this === this.team.closestToBall) {
-        var velToBall = this.velToBall.round();
-        this.vel.x = velToBall.x;
-        this.vel.y = velToBall.y;
-      }
-    }
-  }
+Player.prototype.isBallOwner = function() {
+  return this.ball.owner === this;
+};
 
-  if (this.vel.x || this.vel.y) {
-    this.angle = math.pointToAngle(this.vel);
-  }
+Player.prototype.isMaster = function() {
+  return this.team.master === this;
+};
 
-  this.face = this.faceMap[this.vel];
+Player.prototype.isNearBall = function() {
+  return this.distanceToBall < this.nearBallDistance;
+};
 
-  // ball collision
-  if (this.ball.pos.z <= this.pos.z + 12 * this.scale) {
-    if (this.distanceToBall < this.touchBall) {
-      // this.team.setMaster(this);
-      var rand = 0.85 + Math.random() * 0.46;
-      if (this.vel.x || this.vel.y) this.ball.vel.x = this.vel.x * speed * rand;
-      if (this.vel.y || this.vel.x) this.ball.vel.y = this.vel.y * speed * rand;
-    } else if (this.distanceToBall < this.nearBall && this.distanceToBall >= this.touchBall) {
-      this.ball.vel.x += (this.pos.x - this.ball.pos.x) * 0.12;
-      this.ball.vel.y += (this.pos.y - this.ball.pos.y) * 0.12;
-    }
-  }
+Player.prototype.isVeryNearBall = function() {
+  return this.distanceToBall < this.veryNearBallDistance;
+};
 
-  var pos = {
-    x: this.pos.x + (this.vel.x * speed | 0),
-    y: this.pos.y + (this.vel.y * speed | 0)
+Player.prototype.isTouchingBall = function() {
+  return this.distanceToBall < this.touchBallDistance;
+};
+
+Player.prototype.isDribblingBall = function() {
+  return this.distanceToBall < this.dribbleBallDistance;
+};
+
+Player.prototype.isBallBelowZ = function() {
+  return this.ball.pos.z <= this.pos.z + 12 * this.scale;
+};
+
+Player.prototype.isInFormation = function() {
+  return this.distanceToFormation < this.formationInDistance;
+};
+
+Player.prototype.runToBall = function() {
+  var velToBall = this.velToBall.round();
+  this.vel.x = velToBall.x;
+  this.vel.y = velToBall.y;
+  return true;
+};
+
+Player.prototype.runToFormation = function() {
+  var velToFormation = this.velToFormation.round();
+  this.vel.x = velToFormation.x;
+  this.vel.y = velToFormation.y;
+  return true;
+};
+
+Player.prototype.makeMaster = function() {
+  this.team.setMaster(this);
+};
+
+Player.prototype.makeBallOwner = function() {
+  this.ball.owner = this;
+  this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.8;
+  this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.8;
+  return true;
+};
+
+Player.prototype.dribbleBall = function() {
+  var rand = 0.86 + Math.random() * 0.56;
+  this.ball.vel.x = this.vel.x * this.velSpeed * rand;
+  this.ball.vel.y = this.vel.y * this.velSpeed * rand;
+  return true;
+};
+
+Player.prototype.attractBall = function() {
+  this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.17;
+  this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.17;
+  return true;
+};
+
+Player.prototype.isClosestToBall = function() {
+  return this.team.closestToBall === this;
+};
+
+Player.prototype.isBallKicker = function() {
+  return this.ball.kicker === this;
+};
+
+Player.prototype.stop = function() {
+  this.vel.x = this.vel.y = 0;
+  return true;
+};
+
+function log(s) {
+  return function() {
+    console.log(s);
+    return true;
   };
+}
+
+Player.prototype.makeBehaviors = function() {
+  var p = this;
+  var _ = behavior;
+  var not = _.not;
+
+  this.maybeRunToBall =
+    _.sequence([
+      not(p.isMaster),
+
+      p.isNearBall,
+      p.runToBall,
+
+      p.isTeamOwner,
+      p.isVeryNearBall,
+      p.stop,
+    ]);
+
+  this.maybeDribble =
+    _.sequence([
+      // p.isMaster,
+
+      p.isBallBelowZ,
+
+      p.isTouchingBall,
+      p.attractBall,
+      p.makeMaster,
+
+      p.isDribblingBall,
+
+      _.select([
+        _.sequence([
+          not(p.isBallOwner),
+          p.makeBallOwner,
+        ]),
+
+        p.dribbleBall,
+      ]),
+    ]);
+};
+
+Player.prototype.updateBehaviors = function() {
+  this.maybeDribble();
+  this.maybeRunToBall();
+  this.maybeShoot();
+};
+
+Player.prototype.updateCollisions = function() {
+  var pos = this.newPos;
 
   if (this.pos.x <= this.stadium.leftGoalArea.front[0].x) {
     if ( this.pos.x >= this.stadium.leftGoalArea.back[0].x
@@ -207,32 +325,68 @@ Player.prototype.update = function() {
     }
   }
 
-  this.pos.x = pos.x;
-  this.pos.y = pos.y;
-
-  this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(this.pos.x, this.stadium.bounds[0].x));
-  this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(this.pos.y, this.stadium.bounds[0].y));
-
-  this.maybeShoot();
+  this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(pos.x, this.stadium.bounds[0].x));
+  this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(pos.y, this.stadium.bounds[0].y));
 };
 
-Player.prototype.render = function(dt, alpha) {
-  this.px.x += (this.pos.x - this.px.x) * alpha;
-  this.px.y += (this.pos.y - this.px.y) * alpha;
+Player.prototype.updatePhysics = function() {
+  this.distanceToBall = math.distanceTo(this.ball, this);
+  this.angleToBall = math.angleTo(this.ball, this);
+  this.velToBall = math.angleToPoint(this.angleToBall);
+
+  this.distanceToFormation = math.distanceTo(this.formation, this);
+  this.angleToFormation = math.distanceTo(this.formation, this);
+  this.velToFormation = math.angleToPoint(this.angleToFormation);
+
+  if (this.vel.x || this.vel.y) {
+    this.angle = math.pointToAngle(this.vel);
+  } else {
+    this.angle = math.pointToAngle(this.velToBall.round());
+  }
+
+  this.velSpeed = this.speed;
+  if (this.vel.x && this.vel.y) this.velSpeed *= 0.75;
+
+  this.newPos.x = this.pos.x + (this.vel.x * this.velSpeed);
+  this.newPos.y = this.pos.y + (this.vel.y * this.velSpeed);
+};
+
+Player.prototype.renderFaceAnimation = function() {
+  this.faceStandMap['0,0'] = this.faceMap['0,0'] = this.faceStandMap[this.velToBall.round()];
+  this.face = this.faceMap[this.vel];
 
   var i = this.faceIndex;
   var n = this.faceNeedle;
   n %= this.animation[this.face].length;
 
   var index = this.animation[this.face][n];
-  var x = index[0] * this.width * this.scale;
-  var y = index[1] ? this.height * this.scale + this.scale : 0;
+  this.facePos.x = index[0] * this.width * this.scale;
+  this.facePos.y = index[1] ? this.height * this.scale + this.scale : 0;
   this.faceIndex = (i + 1) % this.faceDuration;
   if (this.faceIndex === 0) this.faceNeedle = n + 1;
+};
 
+Player.prototype.renderPosition = function(alpha) {
+  this.px.x += (this.pos.x - this.px.x) * alpha;
+  this.px.y += (this.pos.y - this.px.y) * alpha;
+};
+
+Player.prototype.renderDraw = function() {
   Object.assign(this.el.style, {
     left: this.px.x + 'px',
     top: this.px.y + 'px',
-    backgroundPosition: `-${x}px -${y}px`,
+    backgroundPosition: `-${this.facePos.x}px -${this.facePos.y}px`,
   });
+};
+
+Player.prototype.update = function() {
+  this.updateBehaviors();
+  this.updatePhysics();
+  this.updateCollisions();
+};
+
+Player.prototype.render = function(dt, alpha) {
+  this.renderFaceAnimation();
+  this.renderPosition(alpha);
+  this.renderDraw();
 };

@@ -6,17 +6,25 @@ module.exports = Ball;
 
 function Ball(game) {
   Object.assign(this, sprite.create('ball'));
-  this.game = game;
-  this.stadium = this.game.stadium;
+
   this.el.className = css.ball;
   this.shadow = sprite.create('ball_shadow');
   this.shadow.el.className = css['ball-shadow'];
+
+  this.game = game;
+  this.stadium = this.game.stadium;
 
   this.gravity = 2.65;
   this.friction = 0.91;
   this.airFriction = 0.935;
   this.shotDuration = 10;
+  this.passDuration = 5;
 
+  this.owner = null;
+  this.shooting = 0;
+  this.passing = false;
+
+  this.facePos = 0;
   this.faceIndex = 0;
   this.faceNeedle = 0;
   this.faceDuration = 4;
@@ -28,9 +36,15 @@ Ball.prototype.randomizeRotation = function() {
 };
 
 Ball.prototype.shoot = function(player) {
-  this.shooting = 10;
+  this.shooting = this.shotDuration;
   this.kicker = player;
   this.angle = this.kicker.angle;
+};
+
+Ball.prototype.pass = function(player) {
+  this.passing = true;
+  this.shooting = this.passDuration;
+  this.kicker = player;
 };
 
 Ball.prototype.updateCollisions = function() {
@@ -256,10 +270,7 @@ Ball.prototype.updateShot = function() {
     shotPower = Math.max(0, this.shooting * shotPower * .15);
     if (this.shooting === this.shotDuration) shotPower *= 2;
 
-    var angleDiff = Math.abs(Math.atan2(
-      Math.sin(this.kicker.angle-this.angle),
-      Math.cos(this.kicker.angle-this.angle)
-    ));
+    var angleDiff = math.angleDiff(this.kicker.angle, this.angle);
 
     if (this.kicker.vel.x || this.kicker.vel.y) {
       var vel = math.angleToPoint(this.kicker.angle);
@@ -306,10 +317,8 @@ Ball.prototype.renderFaceAnimation = function() {
   var i = this.faceIndex;
   var n = this.faceNeedle;
   n %= this.sprite.length;
-
   this.facePos = this.faceMap[n] * this.width * this.scale;
   this.faceIndex = (i + 1) % this.faceDuration;
-
   if (this.faceIndex === 0 && (this.vel.x || this.vel.y)) this.faceNeedle = n + 1;
 };
 
@@ -318,7 +327,9 @@ Ball.prototype.renderPosition = function(alpha) {
   this.px.x += (this.pos.x - this.px.x) * alpha;
   this.px.y += (this.pos.y - this.px.y) * alpha;
   this.px.z += (this.pos.z - this.px.z) * alpha;
+};
 
+Ball.prototype.renderDraw = function() {
   Object.assign(this.el.style, {
     left: this.px.x + 'px',
     top: (this.px.y - this.px.z) + 'px',
@@ -341,4 +352,5 @@ Ball.prototype.render = function(dt, alpha) {
   this.renderRotationAnimation();
   this.renderFaceAnimation();
   this.renderPosition(alpha);
+  this.renderDraw();
 };

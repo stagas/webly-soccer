@@ -691,6 +691,7 @@ sprite.create = function createSprite(name, palette) {
     el: div,
     px: new Point,
     pos: new Point,
+    newPos: new Point,
     vel: new Point,
     angle: 0,
     sprite: s,
