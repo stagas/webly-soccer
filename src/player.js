@@ -115,6 +115,10 @@ Player.prototype.isRunning = function() {
   return this.vel.x || this.vel.y;
 };
 
+Player.prototype.isKeeper = function() {
+  return this.number === 0;
+};
+
 Player.prototype.isTeamOwner = function() {
   return this.ball.owner && this.ball.owner.team === this.team;
 };
@@ -397,8 +401,12 @@ Player.prototype.updatePhysics = function() {
 };
 
 Player.prototype.renderFaceAnimation = function() {
-  this.faceStandMap['0,0'] = this.faceMap['0,0'] = this.faceStandMap[this.velToBall.round()];
+  this.faceStandMap['0,0'] = this.faceMap['0,0'] =
+  this.faceStandMap[this.velToBall.round()];
+
   this.face = this.faceMap[this.vel.round()];
+
+  if (this.isKeeper()) this.face = 'keeper_jump_down_right';
 
   var i = this.faceIndex;
   var n = this.faceNeedle;

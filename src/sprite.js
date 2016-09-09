@@ -419,9 +419,85 @@ sprite.player = [
     t
     s\
 `,
+
+// 18: keeper jump left right
+
+`\
+    xxx
+   xxxxx
+  xxxxx.
+  xxxx.ox
+  .xx.t.
+   t .t
+    ttt
+    ttt
+    ttt
+    ppp
+    . .
+    t .
+    s t
+      s
+     \
+`,
+
+`\
+
+    xxx
+   xxxxx
+  xx....
+  x.ox.xo
+   t...
+   tt.t
+    ttt
+    ttt
+     ppp
+     . .
+     . t
+     t s
+     s
+    \
+`,
+
+
+// 19: keeper on ground left right
+`\
+     x
+  xx.o.
+ xxxx..
+ xxxxx.%
+  xxxxt%%+
+   xx.t%%%
+    ttt%%
+    ttt%
+    ttt%
+    ppp%
+    .%.%
+    t%t%
+    s%s%
+    s%s%\
+`,
+
+`\
+   s s
+   t t
+   . .
+   ppp
+   txxx
+   xxxxx
+  xx....
+  x.ox.xo
+   t....
+   ttt.t
+   .tttt.
+    \
+`,
+
+
 ];
 
-sprite.player.shadow = function makeShadow(art) {
+sprite.player.shadow = function makeShadow(art, n) {
+  if (n >= 20) return art;
+
   if ('string' === typeof art) art = art.split('\n');
   art = art.slice();
   var flipped = art.slice().reverse();
@@ -463,6 +539,9 @@ sprite.player.animation = {
   run_up_right: [[13],[14],[15],[3]],
   run_down_left: [[11,true],[12,true],[10,true],[1,true]],
   run_up_left: [[13,true],[14,true],[15,true],[3,true]],
+
+  keeper_jump_up_right: [[19]],
+  keeper_jump_down_right: [[21]],
 };
 
 sprite.player.palette = {
@@ -656,7 +735,7 @@ sprite.create = function createSprite(name, palette) {
 
   // normal
   s.forEach((art, index) => {
-    if (s.shadow) art = s.shadow(art);
+    if (s.shadow) art = s.shadow(art, index);
     pixel.art(art)
     .palette(palette)
     .scale(s.scale).pos({
@@ -670,7 +749,7 @@ sprite.create = function createSprite(name, palette) {
   s.forEach((art, index) => {
     if ('string' === typeof art) art = art.split('\n');
     art = art.map(row => padRight(row, s.width).split('').reverse().join(''));
-    if (s.shadow) art = s.shadow(art);
+    if (s.shadow) art = s.shadow(art, index);
     pixel.art(art)
     .palette(palette)
     .scale(s.scale).pos({
