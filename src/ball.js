@@ -1,4 +1,5 @@
 var css = require('../style.css');
+var Point = require('../lib/point');
 var math = require('../lib/math');
 var sprite = require('./sprite');
 
@@ -23,6 +24,8 @@ function Ball(game) {
   this.owner = null;
   this.shooting = 0;
   this.passing = false;
+
+  this.prediction = { pos: new Point };
 
   this.facePos = 0;
   this.faceIndex = 0;
@@ -259,6 +262,8 @@ Ball.prototype.updatePhysics = function() {
   this.vel.x *= this.pos.z > 1 ? this.airFriction : this.friction;
   this.vel.y *= this.pos.z > 1 ? this.airFriction : this.friction;
   this.vel.z -= this.gravity;
+  this.prediction.pos.x = this.pos.x + this.vel.x * 3;
+  this.prediction.pos.y = this.pos.y + this.vel.y * 3;
   var absVel = this.vel.abs();
   if (absVel.x < 1) this.vel.x = 0;
   if (absVel.y < 1) this.vel.y = 0;

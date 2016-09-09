@@ -155,7 +155,7 @@ Player.prototype.runToBall = function() {
   var velToBall = this.velToBall.round();
   this.vel.x = velToBall.x;
   this.vel.y = velToBall.y;
-  return true;
+  return this.isDribblingBall() ? true : null;
 };
 
 Player.prototype.runToFormation = function() {
@@ -347,7 +347,7 @@ Player.prototype.updateCollisions = function() {
 
 Player.prototype.updatePhysics = function() {
   this.distanceToBall = math.distanceTo(this.ball, this);
-  this.angleToBall = math.angleTo(this.ball, this);
+  this.angleToBall = math.angleTo(this.ball.prediction, this);
   this.velToBall = math.angleToPoint(this.angleToBall);
 
   this.distanceToFormation = math.distanceTo(this.formation, this);
