@@ -10,7 +10,7 @@ var connect = require('./src/network');
 
 var keys = arrows(document.body, onkeys);
 
-var game = {};
+var game = window.game = {};
 
 var stadium = game.stadium = new Stadium;
 var ball = game.ball = new Ball(game);

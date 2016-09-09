@@ -34,7 +34,7 @@ function Player(game, data) {
   this.veryNearBallDistance = 120;
   this.touchBallDistance = 26;
   this.dribbleBallDistance = 16;
-  this.formationInDistance = 50;
+  this.formationInDistance = 30;
 
   this.speed = 19;
   this.shootTimer = 0;
@@ -77,7 +77,7 @@ Player.prototype.setPosition = function(pos) {
 };
 
 Player.prototype.setFormation = function(pos) {
-  this.formation = { pos: pos };
+  this.formation = { pos: new Point(pos) };
   this.setPosition(this.formation.pos);
 };
 
@@ -116,7 +116,7 @@ Player.prototype.isRunning = function() {
 };
 
 Player.prototype.isTeamOwner = function() {
-  return this.ball.owner ? this.ball.owner.team === this.team : false;
+  return this.ball.owner && this.ball.owner.team === this.team;
 };
 
 Player.prototype.isBallOwner = function() {
@@ -152,17 +152,17 @@ Player.prototype.isInFormation = function() {
 };
 
 Player.prototype.runToBall = function() {
-  var velToBall = this.velToBall.round();
+  var velToBall = this.velToBall; //.round();
   this.vel.x = velToBall.x;
   this.vel.y = velToBall.y;
-  return this.isDribblingBall() || this.isTeamOwner() ? true : null;
+  return true;
 };
 
 Player.prototype.runToFormation = function() {
   var velToFormation = this.velToFormation.round();
   this.vel.x = velToFormation.x;
   this.vel.y = velToFormation.y;
-  return this.isInFormation() || !this.isTeamOwner() ? true : null;
+  return true;
 };
 
 Player.prototype.makeMaster = function() {
@@ -171,7 +171,6 @@ Player.prototype.makeMaster = function() {
 
 Player.prototype.makeBallOwner = function() {
   this.ball.owner = this;
-  this.ball.passing = false;
   this.ball.pos.x += (this.pos.x - this.ball.pos.x) * 0.8;
   this.ball.pos.y += (this.pos.y - this.ball.pos.y) * 0.8;
   return true;
@@ -217,45 +216,41 @@ function log(s) {
 Player.prototype.makeBehaviors = function() {
   var p = this;
   var _ = behavior;
-  var not = _.not;
-  var repeat = _.repeat;
 
   this.maybeShoot =
     _.sequence([
       p.isBallOwner,
-      p.isTouchingBall,
+      p.isDribblingBall,
       p.shoot,
       p.isPastShootThreshold,
       p.actuallyShoot,
     ]);
 
-  // this.maybeGoBack =
-  //   _.sequence([
-  //     not(p.isMaster),
-  //     repeat(_.sequence([
-  //       not(p.isInFormation),
-  //       p.runToFormation,
-  //     ])),
-  //     p.stop,
-  //   ]);
-
   this.maybeRunToBall =
     _.sequence([
-      not(p.isMaster),
+      _.not(p.isMaster),
 
       _.select([
         _.sequence([
           p.isClosestToBallPrediction,
-          p.runToBall,
 
-          p.isTeamOwner,
+          _.repeat(_.sequence([
+            _.not(p.isDribblingBall),
+            _.not(p.isTeamOwner),
+            p.runToBall,
+          ])),
+
+          // p.isTeamOwner,
           p.isVeryNearBall,
           p.stop,
         ]),
 
         _.sequence([
-          not(p.isInFormation),
-          p.runToFormation,
+          _.repeat(_.sequence([
+            _.not(p.isInFormation),
+            _.not(p.isNearBall),
+            p.runToFormation,
+          ])),
           p.stop,
         ]),
 
@@ -273,11 +268,11 @@ Player.prototype.makeBehaviors = function() {
       p.attractBall,
       p.makeMaster,
 
-      not(p.isBallKicker),
+      _.not(p.isBallKicker),
 
       _.select([
         _.sequence([
-          not(p.isBallOwner),
+          _.not(p.isBallOwner),
           p.makeBallOwner,
           p.dribbleBall,
         ]),
@@ -367,18 +362,18 @@ Player.prototype.updatePhysics = function() {
   this.angleToBall = math.angleTo(this.ball.prediction, this);
   this.velToBall = math.angleToPoint(this.angleToBall);
 
-  this.distanceToFormation = math.distanceTo(this.formation, this);
-  this.angleToFormation = math.angleTo(this.formation, this);
+  this.distanceToFormation = math.distanceTo({ pos: this.formation.pos.lerp(this.ball.prediction.pos, 0.3) }, this);
+  this.angleToFormation = math.angleTo({ pos: this.formation.pos.lerp(this.ball.prediction.pos, 0.3) }, this);
   this.velToFormation = math.angleToPoint(this.angleToFormation);
 
-  if (this.vel.x || this.vel.y) {
+  if (this.isRunning()) {
     this.angle = math.pointToAngle(this.vel);
   } else {
     this.angle = math.pointToAngle(this.velToBall.round());
   }
 
   this.velSpeed = this.speed;
-  if (this.vel.x && this.vel.y) this.velSpeed *= 0.75;
+  if (this.vel.round().x && this.vel.round().y) this.velSpeed *= 0.75;
 
   this.newPos.x = this.pos.x + (this.vel.x * this.velSpeed);
   this.newPos.y = this.pos.y + (this.vel.y * this.velSpeed);
@@ -386,7 +381,7 @@ Player.prototype.updatePhysics = function() {
 
 Player.prototype.renderFaceAnimation = function() {
   this.faceStandMap['0,0'] = this.faceMap['0,0'] = this.faceStandMap[this.velToBall.round()];
-  this.face = this.faceMap[this.vel];
+  this.face = this.faceMap[this.vel.round()];
 
   var i = this.faceIndex;
   var n = this.faceNeedle;

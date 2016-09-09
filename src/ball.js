@@ -23,7 +23,6 @@ function Ball(game) {
 
   this.owner = null;
   this.shooting = 0;
-  this.passing = false;
 
   this.prediction = { pos: new Point };
 
@@ -46,7 +45,6 @@ Ball.prototype.shoot = function(player) {
 };
 
 Ball.prototype.pass = function(player) {
-  this.passing = true;
   this.shooting = this.passDuration;
   this.kicker = player;
   this.owner = null;
@@ -269,6 +267,12 @@ Ball.prototype.updatePhysics = function() {
   if (absVel.y < 1) this.vel.y = 0;
 };
 
+Ball.prototype.updateOwner = function() {
+  if (this.game.team.getPlayerClosestToBall().distanceToBall > 50) {
+    this.owner = null;
+  }
+};
+
 Ball.prototype.updateShot = function() {
   if (this.shooting) {
     var shotPower = this.kicker.speed;
@@ -350,6 +354,7 @@ Ball.prototype.renderDraw = function() {
 };
 
 Ball.prototype.update = function() {
+  this.updateOwner();
   this.updateShot();
   this.updateCollisions();
   this.updatePhysics();
