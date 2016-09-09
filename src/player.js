@@ -91,14 +91,14 @@ Player.prototype.shoot = function() {
   return true;
 };
 
-Player.prototype.shootEnd = function() {
-  if (this.shootTimer) this.pass();
-};
-
 Player.prototype.pass = function() {
   this.team.pass();
   this.shootTimer = 0;
   return true;
+};
+
+Player.prototype.isShooting = function() {
+  return this.shootTimer > 0;
 };
 
 Player.prototype.isPastShootThreshold = function() {
@@ -180,6 +180,7 @@ Player.prototype.dribbleBall = function() {
   var rand = 0.86 + Math.random() * 0.46;
   this.ball.vel.x = this.vel.x * this.velSpeed * rand;
   this.ball.vel.y = this.vel.y * this.velSpeed * rand;
+  this.ball.vel.z *= 0.8;
   return true;
 };
 
@@ -216,6 +217,15 @@ function log(s) {
 Player.prototype.makeBehaviors = function() {
   var p = this;
   var _ = behavior;
+
+  this.shootEnd =
+    _.sequence([
+      p.isShooting,
+      _.not(p.isPastShootThreshold),
+      p.isBallBelowZ,
+      p.isTouchingBall,
+      p.pass,
+    ]);
 
   this.maybeShoot =
     _.sequence([
