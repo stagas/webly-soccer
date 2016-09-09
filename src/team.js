@@ -57,6 +57,13 @@ Team.prototype.getPlayerClosestToBall = function(ref) {
     .sort((a, b) => a.distanceToBall - b.distanceToBall)[0];
 };
 
+Team.prototype.getPlayerClosestToBallPrediction = function(ref) {
+  return this.players
+    .slice()
+    .filter(player => player !== ref)
+    .sort((a, b) => a.distanceToBallPrediction - b.distanceToBallPrediction)[0];
+};
+
 Team.prototype.setMaster = function(player) {
   if (this.master) {
     this.master.master = false;
@@ -79,8 +86,8 @@ Team.prototype.placeFormation = function() {
     row.forEach((col, x) => {
       if (col) {
         this.players[col - 1].setFormation({
-          x: x * colWidth + colWidth / 2,
-          y: y * rowHeight + rowHeight / 2
+          x: x * colWidth + colWidth / 2 + this.stadium.offset.x,
+          y: y * rowHeight + rowHeight / 2 + this.stadium.offset.y
         });
       }
     });
@@ -95,7 +102,8 @@ Team.prototype.randomColors = function() {
 };
 
 Team.prototype.update = function() {
-  this.closestToBall = this.getPlayerClosestToBall();
+  this.closestToBall = this.getPlayerClosestToBall(this.ball.owner || this.ball.kicker);
+  this.closestToBallPrediction = this.getPlayerClosestToBallPrediction(this.ball.owner || this.ball.kicker);
   this.players.forEach(player => player.update());
 };
 

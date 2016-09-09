@@ -34,7 +34,7 @@ function Player(game, data) {
   this.veryNearBallDistance = 120;
   this.touchBallDistance = 26;
   this.dribbleBallDistance = 16;
-  this.formationInDistance = 400;
+  this.formationInDistance = 50;
 
   this.speed = 19;
   this.shootTimer = 0;
@@ -72,8 +72,8 @@ function Player(game, data) {
 }
 
 Player.prototype.setPosition = function(pos) {
-  this.pos.x = this.px.x = pos.x + this.game.stadium.offset.x;
-  this.pos.y = this.px.y = pos.y + this.game.stadium.offset.y;
+  this.pos.x = this.px.x = pos.x;
+  this.pos.y = this.px.y = pos.y;
 };
 
 Player.prototype.setFormation = function(pos) {
@@ -155,14 +155,14 @@ Player.prototype.runToBall = function() {
   var velToBall = this.velToBall.round();
   this.vel.x = velToBall.x;
   this.vel.y = velToBall.y;
-  return this.isDribblingBall() ? true : null;
+  return this.isDribblingBall() || this.isTeamOwner() ? true : null;
 };
 
 Player.prototype.runToFormation = function() {
   var velToFormation = this.velToFormation.round();
   this.vel.x = velToFormation.x;
   this.vel.y = velToFormation.y;
-  return true;
+  return this.isInFormation() || !this.isTeamOwner() ? true : null;
 };
 
 Player.prototype.makeMaster = function() {
@@ -192,6 +192,10 @@ Player.prototype.attractBall = function() {
 
 Player.prototype.isClosestToBall = function() {
   return this.team.closestToBall === this;
+};
+
+Player.prototype.isClosestToBallPrediction = function() {
+  return this.team.closestToBallPrediction === this;
 };
 
 Player.prototype.isBallKicker = function() {
@@ -239,12 +243,24 @@ Player.prototype.makeBehaviors = function() {
     _.sequence([
       not(p.isMaster),
 
-      p.isClosestToBall,
-      p.runToBall,
+      _.select([
+        _.sequence([
+          p.isClosestToBallPrediction,
+          p.runToBall,
 
-      p.isTeamOwner,
-      p.isVeryNearBall,
-      p.stop,
+          p.isTeamOwner,
+          p.isVeryNearBall,
+          p.stop,
+        ]),
+
+        _.sequence([
+          not(p.isInFormation),
+          p.runToFormation,
+          p.stop,
+        ]),
+
+        p.stop,
+      ])
     ]);
 
   this.maybeDribble =
@@ -346,12 +362,13 @@ Player.prototype.updateCollisions = function() {
 };
 
 Player.prototype.updatePhysics = function() {
+  this.distanceToBallPrediction = math.distanceTo(this.ball.prediction, this);
   this.distanceToBall = math.distanceTo(this.ball, this);
   this.angleToBall = math.angleTo(this.ball.prediction, this);
   this.velToBall = math.angleToPoint(this.angleToBall);
 
   this.distanceToFormation = math.distanceTo(this.formation, this);
-  this.angleToFormation = math.distanceTo(this.formation, this);
+  this.angleToFormation = math.angleTo(this.formation, this);
   this.velToFormation = math.angleToPoint(this.angleToFormation);
 
   if (this.vel.x || this.vel.y) {
