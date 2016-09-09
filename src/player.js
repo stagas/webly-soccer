@@ -34,7 +34,7 @@ function Player(game, data) {
   this.veryNearBallDistance = 120;
   this.touchBallDistance = 26;
   this.dribbleBallDistance = 16;
-  this.formationInDistance = 30;
+  this.formationInDistance = 100;
 
   this.speed = 19;
   this.shootTimer = 0;
@@ -159,7 +159,7 @@ Player.prototype.runToBall = function() {
 };
 
 Player.prototype.runToFormation = function() {
-  var velToFormation = this.velToFormation.round();
+  var velToFormation = this.velToFormation;
   this.vel.x = velToFormation.x;
   this.vel.y = velToFormation.y;
   return true;
@@ -362,8 +362,14 @@ Player.prototype.updatePhysics = function() {
   this.angleToBall = math.angleTo(this.ball.prediction, this);
   this.velToBall = math.angleToPoint(this.angleToBall);
 
-  this.distanceToFormation = math.distanceTo({ pos: this.formation.pos.lerp(this.ball.prediction.pos, 0.3) }, this);
-  this.angleToFormation = math.angleTo({ pos: this.formation.pos.lerp(this.ball.prediction.pos, 0.3) }, this);
+  this.tacticsFormation = {
+    pos: this.formation.pos.lerp(this.ball.prediction.pos, 0.2)
+  };
+  if (this.ball.pos.x > (this.stadium.offset.x + this.stadium.size.x / 2)) {
+    this.tacticsFormation.pos.x += 150;
+  }
+  this.distanceToFormation = math.distanceTo(this.tacticsFormation, this);
+  this.angleToFormation = math.angleTo(this.tacticsFormation, this);
   this.velToFormation = math.angleToPoint(this.angleToFormation);
 
   if (this.isRunning()) {
