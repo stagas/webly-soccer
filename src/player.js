@@ -219,6 +219,7 @@ Player.prototype.makeBehaviors = function() {
 
   this.maybeShoot =
     _.sequence([
+      p.isBallBelowZ,
       p.isBallOwner,
       p.isDribblingBall,
       p.shoot,

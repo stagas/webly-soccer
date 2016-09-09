@@ -21,7 +21,11 @@ function Team(game, data) {
 Team.prototype.createPlayers = function() {
   this.players = [];
   for (var i = 0; i < 11; i++) {
-    var player = new Player(this.game, { team: this, colors: this.colors, number: i });
+    var player = new Player(this.game, {
+      team: this,
+      colors: i === 0 ? { 't': '#333', 'p': '#333' } : this.colors,
+      number: i
+    });
     this.players.push(player);
     this.el.appendChild(player.el);
   }
