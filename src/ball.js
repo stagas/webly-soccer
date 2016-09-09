@@ -20,6 +20,7 @@ function Ball(game) {
   this.airFriction = 0.935;
   this.shotDuration = 10;
   this.passDuration = 5;
+  this.netsHeight = 15 * this.scale;
 
   this.owner = null;
   this.shooting = 0;
@@ -57,8 +58,7 @@ Ball.prototype.updateCollisions = function() {
     z: this.pos.z + this.vel.z
   };
 
-  var netsHeight = 12 * this.scale;
-  var isBelowGoalNetsHeight = this.pos.z <= netsHeight;
+  var isBelowGoalNetsHeight = this.pos.z <= this.netsHeight;
   if (isBelowGoalNetsHeight) {
     var point;
 
@@ -165,12 +165,12 @@ Ball.prototype.updateCollisions = function() {
           Math.max(pos.y, this.stadium.leftGoalArea.back[0].y + 3),
           this.stadium.leftGoalArea.back[1].y - 7
         );
-        if (pos.z >= netsHeight) {
-          pos.z = netsHeight;
+        if (pos.z >= this.netsHeight) {
+          pos.z = this.netsHeight;
           this.vel.z = -this.vel.z;
         }
-      } else if (pos.z <= netsHeight) {
-        pos.z = netsHeight + 1;
+      } else if (pos.z <= this.netsHeight) {
+        pos.z = this.netsHeight + 1;
         pos.x -= 2;
         this.vel.x *= 0.9;
         this.vel.y *= 0.9;
@@ -190,13 +190,13 @@ Ball.prototype.updateCollisions = function() {
           Math.max(pos.y, this.stadium.rightGoalArea.back[0].y + 3),
           this.stadium.rightGoalArea.back[1].y - 7
         );
-        if (pos.z >= netsHeight) {
-          pos.z = netsHeight;
+        if (pos.z >= this.netsHeight) {
+          pos.z = this.netsHeight;
           this.vel.z = -this.vel.z;
           // this.vel.z = 0;
         }
-      } else if (pos.z <= netsHeight) {
-        pos.z = netsHeight + 1;
+      } else if (pos.z <= this.netsHeight) {
+        pos.z = this.netsHeight + 1;
         pos.x += 2;
         this.vel.x *= 0.9;
         this.vel.y *= 0.9;
@@ -211,10 +211,10 @@ Ball.prototype.updateCollisions = function() {
 
     var hit = math.lineCircleCollision(
       [{ x: this.pos.x, y: this.pos.z }, { x: pos.x, y: pos.z }],
-      { x: this.stadium.leftGoalArea.front[0].x, y: netsHeight }, 9
+      { x: this.stadium.leftGoalArea.front[0].x, y: this.netsHeight }, 9
     ) || math.lineCircleCollision(
       [{ x: this.pos.x, y: this.pos.z }, { x: pos.x, y: pos.z }],
-      { x: this.stadium.rightGoalArea.front[0].x, y: netsHeight }, 9
+      { x: this.stadium.rightGoalArea.front[0].x, y: this.netsHeight }, 9
     );
 
     if (hit) {
