@@ -449,14 +449,14 @@ sprite.player = [
   xx....
   x.ox.xo
    t...
-   tt.t
+    t.t
     ttt
     ttt
-     ppp
-     . .
-     . t
-     t s
-     s
+    ppp
+    . .
+    . t
+    t s
+    s
     \
 `,
 
@@ -482,18 +482,20 @@ sprite.player = [
 // 21: keeper stretch down right
 
 `\
+
    s s
    t t
    . .
    ppp
+   ttt
+   ttt
    txxx
    xxxxx
   xx....
   x.ox.xo
    t....
    ttt.t
-   .tttt.
-    \
+   .   .\
 `,
 
 

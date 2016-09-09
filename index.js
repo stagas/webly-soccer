@@ -8,10 +8,9 @@ var Team = require('./src/team');
 var Ball = require('./src/ball');
 var connect = require('./src/network');
 
-var keys = arrows(document.body, onkeys);
-
 var game = window.game = {};
 
+var keys = game.keys = arrows(document.body, onkeys);
 var stadium = game.stadium = new Stadium;
 var ball = game.ball = new Ball(game);
 var team = game.team = new Team(game);
@@ -42,11 +41,11 @@ var prevTime = Date.now();
 var prevKeys = +keys;
 
 loop.on('update', (dt, alpha, frame) => {
-  controls(keys, team.master);
+  // controls(keys, team.master);
 
-  if (opponent.team) {
-    controls(opponent.keys, opponent.team);
-  }
+  // if (opponent.team) {
+  //   controls(opponent.keys, opponent.team);
+  // }
 
   update(frame);
 
@@ -89,15 +88,14 @@ function render(dt, alpha, frame, elapsed) {
   camera.render(dt, alpha);
 }
 
-function controls(k, player) {
-  if (player.pos.z > 0) return;
-  player.vel.x = player.vel.y = 0;
-  k & keys.left  && player.move(-1,0);
-  k & keys.up    && player.move(0,-1);
-  k & keys.right && player.move(1,0);
-  k & keys.down  && player.move(0,1);
-  k & keys.shoot ? player.maybeShoot() : player.shootEnd();
-}
+// function controls(k, player) {
+//   player.vel.x = player.vel.y = 0;
+//   k & keys.left  && player.move(-1,0);
+//   k & keys.up    && player.move(0,-1);
+//   k & keys.right && player.move(1,0);
+//   k & keys.down  && player.move(0,1);
+//   k & keys.shoot ? player.maybeShoot() : player.shootEnd();
+// }
 
 function onkeys(k) {
   k & keys.shoot ? team.master.maybeShoot() : team.master.shootEnd();

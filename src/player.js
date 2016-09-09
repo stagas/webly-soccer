@@ -82,6 +82,16 @@ Player.prototype.setFormation = function(pos) {
   this.setPosition(this.formation.pos);
 };
 
+Player.prototype.controls = function() {
+  var k = this.game.keys;
+  this.vel.x = this.vel.y = 0;
+  k & k.left  && this.move(-1,0);
+  k & k.up    && this.move(0,-1);
+  k & k.right && this.move(1,0);
+  k & k.down  && this.move(0,1);
+  k & k.shoot ? this.maybeShoot() : this.shootEnd();
+}
+
 Player.prototype.move = function(x, y){
   this.vel.x |= x;
   this.vel.y |= y;
@@ -185,9 +195,9 @@ Player.prototype.holdBall = function() {
   this.ball.vel.x = 0;
   this.ball.vel.y = 0;
   this.ball.vel.z = 0;
-  this.ball.pos.x = this.pos.x;
-  this.ball.pos.y = this.pos.y;
-  this.ball.pos.z = this.pos.z;
+  this.ball.pos.x = this.newPos.x + 9;
+  this.ball.pos.y = this.newPos.y;
+  this.ball.pos.z = 9 //this.newPos.z + 10;
   return true;
 };
 
@@ -227,10 +237,21 @@ Player.prototype.isJumping = function() {
 };
 
 Player.prototype.jumpToBall = function() {
-  this.vel.z = 12;
-  this.vel.x = this.velToBall.x * this.distanceToBall * .01;
-  this.vel.y = this.velToBall.y * this.distanceToBall * .02;
+  this.pos.z = 1;
+  this.vel.z = Math.min(8, this.ball.pos.z);
+  this.vel.x = this.velToBall.x * this.distanceToBall * .02;
+  this.vel.y = this.velToBall.y * this.distanceToBall * .02; //, Math.sign(this.velToBall.y) * 2);
   return true;
+};
+
+Player.prototype.waitToDrop = function() {
+  this.vel.x *= 0.95;
+  this.vel.y *= 0.95;
+  var absVel = this.vel.abs();
+  if (absVel.x < 1) this.vel.x = 0;
+  if (absVel.y < 1) this.vel.y = 0;
+  if (this.isRunning()) return null;
+  else return true;
 };
 
 function log(s) {
@@ -247,12 +268,11 @@ Player.prototype.makeBehaviors = function() {
   this.goalKeeper =
     _.sequence([
       p.isGoalkeeper,
-      _.repeat(_.sequence([
-        _.not(p.isBallOwner),
-        p.isVeryNearBall,
-        _.not(p.isJumping),
-        p.jumpToBall,
-      ])),
+      p.isTouchingBall,
+      p.makeBallOwner,
+      p.makeMaster,
+      p.holdBall,
+      p.controls,
     ]);
 
   this.shootEnd =
@@ -277,6 +297,7 @@ Player.prototype.makeBehaviors = function() {
   this.maybeRunToBall =
     _.sequence([
       _.not(p.isMaster),
+      // _.not(p.isGoalkeeper),
 
       _.select([
         _.sequence([
@@ -306,9 +327,17 @@ Player.prototype.makeBehaviors = function() {
       ])
     ]);
 
+  this.maybeControl =
+    _.sequence([
+      p.isMaster,
+      p.controls,
+    ]);
+
   this.maybeDribble =
     _.sequence([
       // p.isMaster,
+      // _.not(p.isGoalkeeper),
+      // _.not(p.isJumping),
 
       p.isBallBelowZ,
 
@@ -319,16 +348,6 @@ Player.prototype.makeBehaviors = function() {
       _.not(p.isBallKicker),
 
       _.select([
-        _.sequence([
-          p.isGoalkeeper,
-          p.isJumping,
-          _.repeat(_.sequence([
-            p.isJumping,
-            p.makeBallOwner,
-            p.holdBall,
-          ])),
-        ]),
-
         _.sequence([
           _.not(p.isBallOwner),
           p.makeBallOwner,
@@ -341,13 +360,23 @@ Player.prototype.makeBehaviors = function() {
         ]),
       ]),
     ]);
+
+  this.runBehaviors =
+    _.select([
+      p.goalKeeper,
+      _.all([
+        p.maybeDribble,
+        p.maybeRunToBall,
+        p.maybeControl
+      ]),
+    ]);
 };
 
 Player.prototype.updateBehaviors = function() {
-  this.goalKeeper();
-  this.maybeDribble();
-  // this.maybeGoBack();
-  this.maybeRunToBall();
+  this.runBehaviors();
+  // this.maybeDribble();
+  // this.maybeRunToBall();
+  // this.maybeControl();
 };
 
 Player.prototype.updateCollisions = function() {
@@ -414,6 +443,10 @@ Player.prototype.updateCollisions = function() {
   this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(pos.x, this.stadium.bounds[0].x));
   this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(pos.y, this.stadium.bounds[0].y));
   this.pos.z = Math.max(0, pos.z);
+  if (this.pos.z === 0) {
+    this.vel.x = this.vel.x > 0 ? Math.min(1, this.vel.x) : Math.max(-1, this.vel.x);
+    this.vel.y = this.vel.y > 0 ? Math.min(1, this.vel.y) : Math.max(-1, this.vel.y);
+  }
 };
 
 
@@ -442,24 +475,21 @@ Player.prototype.updatePhysics = function() {
   this.velSpeed = this.speed;
   if (this.vel.round().x && this.vel.round().y) this.velSpeed *= 0.75;
 
-  this.vel.z -= this.gravity;
-  // this.vel.z *= 0.72;
-  // this.vel.z = Math.max(0, this.vel.z);
-
   this.newPos.x = this.pos.x + (this.vel.x * this.velSpeed);
   this.newPos.y = this.pos.y + (this.vel.y * this.velSpeed);
   this.newPos.z = this.pos.z + this.vel.z;
+
+  this.vel.z -= this.gravity;
 };
 
 Player.prototype.renderFaceAnimation = function() {
-  this.faceStandMap['0,0'] = this.faceMap['0,0'] =
-  this.faceStandMap[this.velToBall.round()];
-
-  if (this.pos.z === 0) {
-    this.face = this.faceMap[this.vel.round()];
-  } else if (this.isGoalkeeper()) {
+  if (this.isJumping() && this.isGoalkeeper()) {
     if (this.vel.y < 0) this.face = 'keeper_jump_up_right';
     else this.face = 'keeper_jump_down_right';
+  } else {
+    this.faceStandMap['0,0'] = this.faceMap['0,0'] =
+    this.faceStandMap[this.velToBall.round()];
+    this.face = this.faceMap[this.vel.round()];
   }
 
   // if (this.isKeeper()) this.face = 'keeper_jump_down_right';
