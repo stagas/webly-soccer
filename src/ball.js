@@ -15,7 +15,7 @@ function Ball(game) {
   this.game = game;
   this.stadium = this.game.stadium;
 
-  this.gravity = 2.65;
+  this.gravity = 3.65;
   this.friction = 0.91;
   this.airFriction = 0.935;
   this.shotDuration = 10;

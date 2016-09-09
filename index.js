@@ -90,6 +90,7 @@ function render(dt, alpha, frame, elapsed) {
 }
 
 function controls(k, player) {
+  if (player.pos.z > 0) return;
   player.vel.x = player.vel.y = 0;
   k & keys.left  && player.move(-1,0);
   k & keys.up    && player.move(0,-1);

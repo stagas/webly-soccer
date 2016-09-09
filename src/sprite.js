@@ -420,7 +420,7 @@ sprite.player = [
     s\
 `,
 
-// 18: keeper jump left right
+// 18: keeper jump up right
 
 `\
     xxx
@@ -439,6 +439,8 @@ sprite.player = [
       s
      \
 `,
+
+// 19: keeper jump down right
 
 `\
 
@@ -459,23 +461,25 @@ sprite.player = [
 `,
 
 
-// 19: keeper on ground left right
+// 20: keeper stretch up right
 `\
      x
   xx.o.
  xxxx..
- xxxxx.%
-  xxxxt%%+
-   xx.t%%%
-    ttt%%
-    ttt%
-    ttt%
-    ppp%
-    .%.%
-    t%t%
-    s%s%
-    s%s%\
+ xxxxx.
+  xxxxt
+   xx.t
+    ttt
+    ttt
+    ttt
+    ppp
+    . .
+    t t
+    s s
+    s s\
 `,
+
+// 21: keeper stretch down right
 
 `\
    s s

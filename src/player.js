@@ -36,6 +36,7 @@ function Player(game, data) {
   this.dribbleBallDistance = 16;
   this.formationInDistance = 100;
 
+  this.gravity = 2.65;
   this.speed = 19;
   this.shootTimer = 0;
   this.angle = 0;
@@ -115,7 +116,7 @@ Player.prototype.isRunning = function() {
   return this.vel.x || this.vel.y;
 };
 
-Player.prototype.isKeeper = function() {
+Player.prototype.isGoalkeeper = function() {
   return this.number === 0;
 };
 
@@ -180,6 +181,16 @@ Player.prototype.makeBallOwner = function() {
   return true;
 };
 
+Player.prototype.holdBall = function() {
+  this.ball.vel.x = 0;
+  this.ball.vel.y = 0;
+  this.ball.vel.z = 0;
+  this.ball.pos.x = this.pos.x;
+  this.ball.pos.y = this.pos.y;
+  this.ball.pos.z = this.pos.z;
+  return true;
+};
+
 Player.prototype.dribbleBall = function() {
   var rand = 0.86 + Math.random() * 0.46;
   this.ball.vel.x = this.vel.x * this.velSpeed * rand;
@@ -211,6 +222,17 @@ Player.prototype.stop = function() {
   return true;
 };
 
+Player.prototype.isJumping = function() {
+  return this.pos.z > 0;
+};
+
+Player.prototype.jumpToBall = function() {
+  this.vel.z = 12;
+  this.vel.x = this.velToBall.x * this.distanceToBall * .01;
+  this.vel.y = this.velToBall.y * this.distanceToBall * .02;
+  return true;
+};
+
 function log(s) {
   return function() {
     console.log(s);
@@ -221,6 +243,17 @@ function log(s) {
 Player.prototype.makeBehaviors = function() {
   var p = this;
   var _ = behavior;
+
+  this.goalKeeper =
+    _.sequence([
+      p.isGoalkeeper,
+      _.repeat(_.sequence([
+        _.not(p.isBallOwner),
+        p.isVeryNearBall,
+        _.not(p.isJumping),
+        p.jumpToBall,
+      ])),
+    ]);
 
   this.shootEnd =
     _.sequence([
@@ -287,6 +320,16 @@ Player.prototype.makeBehaviors = function() {
 
       _.select([
         _.sequence([
+          p.isGoalkeeper,
+          p.isJumping,
+          _.repeat(_.sequence([
+            p.isJumping,
+            p.makeBallOwner,
+            p.holdBall,
+          ])),
+        ]),
+
+        _.sequence([
           _.not(p.isBallOwner),
           p.makeBallOwner,
           p.dribbleBall,
@@ -301,6 +344,7 @@ Player.prototype.makeBehaviors = function() {
 };
 
 Player.prototype.updateBehaviors = function() {
+  this.goalKeeper();
   this.maybeDribble();
   // this.maybeGoBack();
   this.maybeRunToBall();
@@ -369,7 +413,9 @@ Player.prototype.updateCollisions = function() {
 
   this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(pos.x, this.stadium.bounds[0].x));
   this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(pos.y, this.stadium.bounds[0].y));
+  this.pos.z = Math.max(0, pos.z);
 };
+
 
 Player.prototype.updatePhysics = function() {
   this.distanceToBallPrediction = math.distanceTo(this.ball.prediction, this);
@@ -396,17 +442,27 @@ Player.prototype.updatePhysics = function() {
   this.velSpeed = this.speed;
   if (this.vel.round().x && this.vel.round().y) this.velSpeed *= 0.75;
 
+  this.vel.z -= this.gravity;
+  // this.vel.z *= 0.72;
+  // this.vel.z = Math.max(0, this.vel.z);
+
   this.newPos.x = this.pos.x + (this.vel.x * this.velSpeed);
   this.newPos.y = this.pos.y + (this.vel.y * this.velSpeed);
+  this.newPos.z = this.pos.z + this.vel.z;
 };
 
 Player.prototype.renderFaceAnimation = function() {
   this.faceStandMap['0,0'] = this.faceMap['0,0'] =
   this.faceStandMap[this.velToBall.round()];
 
-  this.face = this.faceMap[this.vel.round()];
+  if (this.pos.z === 0) {
+    this.face = this.faceMap[this.vel.round()];
+  } else if (this.isGoalkeeper()) {
+    if (this.vel.y < 0) this.face = 'keeper_jump_up_right';
+    else this.face = 'keeper_jump_down_right';
+  }
 
-  if (this.isKeeper()) this.face = 'keeper_jump_down_right';
+  // if (this.isKeeper()) this.face = 'keeper_jump_down_right';
 
   var i = this.faceIndex;
   var n = this.faceNeedle;
@@ -422,12 +478,13 @@ Player.prototype.renderFaceAnimation = function() {
 Player.prototype.renderPosition = function(alpha) {
   this.px.x += (this.pos.x - this.px.x) * alpha;
   this.px.y += (this.pos.y - this.px.y) * alpha;
+  this.px.z += (this.pos.z - this.px.z) * alpha;
 };
 
 Player.prototype.renderDraw = function() {
   Object.assign(this.el.style, {
     left: this.px.x + 'px',
-    top: this.px.y + 'px',
+    top: (this.px.y - this.px.z) + 'px',
     backgroundPosition: `-${this.facePos.x}px -${this.facePos.y}px`,
   });
 };
