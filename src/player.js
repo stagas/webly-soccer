@@ -31,8 +31,8 @@ function Player(game, data) {
   this.ball = this.game.ball;
 
   this.nearBallDistance = 200;
-  this.veryNearBallDistance = 120;
-  this.touchBallDistance = 26;
+  this.veryNearBallDistance = 150;
+  this.touchBallDistance = 28;
   this.dribbleBallDistance = 16;
   this.formationInDistance = 100;
 
@@ -90,6 +90,7 @@ Player.prototype.controls = function() {
   k & k.right && this.move(1,0);
   k & k.down  && this.move(0,1);
   k & k.shoot ? this.maybeShoot() : this.shootEnd();
+  return true;
 }
 
 Player.prototype.move = function(x, y){
@@ -98,7 +99,7 @@ Player.prototype.move = function(x, y){
 };
 
 Player.prototype.shoot = function() {
-  this.shootTimer++;
+  this.shootTimer += 1;
   return true;
 };
 
@@ -113,7 +114,7 @@ Player.prototype.isShooting = function() {
 };
 
 Player.prototype.isPastShootThreshold = function() {
-  return this.shootTimer > 4;
+  return this.shootTimer > 3;
 };
 
 Player.prototype.actuallyShoot = function() {
@@ -192,11 +193,13 @@ Player.prototype.makeBallOwner = function() {
 };
 
 Player.prototype.holdBall = function() {
+  var arms = math.angleToPoint(this.angle);
+
   this.ball.vel.x = 0;
   this.ball.vel.y = 0;
   this.ball.vel.z = 0;
-  this.ball.pos.x = this.newPos.x + 9;
-  this.ball.pos.y = this.newPos.y;
+  this.ball.pos.x = this.newPos.x + arms.x * 6;
+  this.ball.pos.y = this.newPos.y + arms.y * 3;
   this.ball.pos.z = 9 //this.newPos.z + 10;
   return true;
 };
@@ -233,24 +236,28 @@ Player.prototype.stop = function() {
 };
 
 Player.prototype.isJumping = function() {
-  return this.pos.z > 0;
+  return this.pos.z > 0 || this.jumping;
 };
 
 Player.prototype.jumpToBall = function() {
-  this.pos.z = 1;
-  this.vel.z = Math.min(8, this.ball.pos.z);
-  this.vel.x = this.velToBall.x * this.distanceToBall * .02;
-  this.vel.y = this.velToBall.y * this.distanceToBall * .02; //, Math.sign(this.velToBall.y) * 2);
+  this.jumping = 20;
+  this.vel.x = this.velToBall.x * Math.min(50, Math.abs(this.ball.prediction.pos.x - this.pos.x) * .45);
+  this.vel.y = this.velToBall.y * Math.min(50, Math.abs(this.ball.prediction.pos.y - this.pos.y) * .45);
   return true;
 };
 
 Player.prototype.waitToDrop = function() {
-  this.vel.x *= 0.95;
-  this.vel.y *= 0.95;
-  var absVel = this.vel.abs();
-  if (absVel.x < 1) this.vel.x = 0;
-  if (absVel.y < 1) this.vel.y = 0;
-  if (this.isRunning()) return null;
+  // this.newPos.z = 1;
+  // this.newPos.x += (this.ball.prediction.pos.x - this.newPos.x) * .2;
+  // this.newPos.y += (this.ball.prediction.pos.y - this.newPos.y) * .2;
+  this.vel.x *= 0.8;
+  this.vel.y *= 0.8;
+  if (this.isTouchingBall() && this.isBallBelowZ()) {
+    this.makeMaster();
+    this.makeBallOwner();
+    this.holdBall();
+  }
+  if (--this.jumping) return null;
   else return true;
 };
 
@@ -265,14 +272,32 @@ Player.prototype.makeBehaviors = function() {
   var p = this;
   var _ = behavior;
 
-  this.goalKeeper =
+  this.goalKeeperWalkWithBall =
     _.sequence([
-      p.isGoalkeeper,
       p.isTouchingBall,
       p.makeBallOwner,
       p.makeMaster,
       p.holdBall,
       p.controls,
+    ]);
+
+  this.goalKeeperMaybeJump =
+    _.sequence([
+      _.not(p.isBallOwner),
+      p.isNearBall,
+      _.not(p.isTouchingBall),
+      p.jumpToBall,
+      p.waitToDrop,
+    ]);
+
+  this.goalKeeper =
+    _.sequence([
+      p.isGoalkeeper,
+      _.not(p.isBallKicker),
+      _.select([
+        p.goalKeeperMaybeJump,
+        p.goalKeeperWalkWithBall,
+      ]),
     ]);
 
   this.shootEnd =
@@ -333,38 +358,36 @@ Player.prototype.makeBehaviors = function() {
       p.controls,
     ]);
 
-  this.maybeDribble =
+  this.maybeMakeMaster =
     _.sequence([
-      // p.isMaster,
-      // _.not(p.isGoalkeeper),
-      // _.not(p.isJumping),
-
+      _.not(p.isMaster),
+      _.not(p.isTeamOwner),
+      _.not(p.isBallKicker),
       p.isBallBelowZ,
-
       p.isTouchingBall,
       p.attractBall,
       p.makeMaster,
+      p.makeBallOwner,
+      p.dribbleBall,
+    ]);
 
+  this.maybeDribble =
+    _.sequence([
       _.not(p.isBallKicker),
-
-      _.select([
-        _.sequence([
-          _.not(p.isBallOwner),
-          p.makeBallOwner,
-          p.dribbleBall,
-        ]),
-
-        _.sequence([
-          p.isDribblingBall,
-          p.dribbleBall,
-        ]),
-      ]),
+      p.isMaster,
+      p.isBallBelowZ,
+      p.isTouchingBall,
+      p.attractBall,
+//      p.makeBallOwner,
+      p.isDribblingBall,
+      p.dribbleBall,
     ]);
 
   this.runBehaviors =
     _.select([
       p.goalKeeper,
       _.all([
+        p.maybeMakeMaster,
         p.maybeDribble,
         p.maybeRunToBall,
         p.maybeControl
@@ -443,7 +466,7 @@ Player.prototype.updateCollisions = function() {
   this.pos.x = Math.min(this.stadium.bounds[1].x, Math.max(pos.x, this.stadium.bounds[0].x));
   this.pos.y = Math.min(this.stadium.bounds[1].y, Math.max(pos.y, this.stadium.bounds[0].y));
   this.pos.z = Math.max(0, pos.z);
-  if (this.pos.z === 0) {
+  if (!this.isJumping()) {
     this.vel.x = this.vel.x > 0 ? Math.min(1, this.vel.x) : Math.max(-1, this.vel.x);
     this.vel.y = this.vel.y > 0 ? Math.min(1, this.vel.y) : Math.max(-1, this.vel.y);
   }
@@ -457,7 +480,7 @@ Player.prototype.updatePhysics = function() {
   this.velToBall = math.angleToPoint(this.angleToBall);
 
   this.tacticsFormation = {
-    pos: this.formation.pos.lerp(this.ball.prediction.pos, 0.2)
+    pos: this.isGoalkeeper() ? new Point(this.formation.pos) : this.formation.pos.lerp(this.ball.prediction.pos, 0.2)
   };
   if (this.ball.pos.x > (this.stadium.offset.x + this.stadium.size.x / 2)) {
     this.tacticsFormation.pos.x += 150;
@@ -474,6 +497,8 @@ Player.prototype.updatePhysics = function() {
 
   this.velSpeed = this.speed;
   if (this.vel.round().x && this.vel.round().y) this.velSpeed *= 0.75;
+
+  if (this.isJumping()) this.velSpeed = 1;
 
   this.newPos.x = this.pos.x + (this.vel.x * this.velSpeed);
   this.newPos.y = this.pos.y + (this.vel.y * this.velSpeed);

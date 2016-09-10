@@ -69,6 +69,8 @@ Team.prototype.getPlayerClosestToBallPrediction = function(ref) {
 };
 
 Team.prototype.setMaster = function(player) {
+  if (this.turn) return;
+
   if (this.master) {
     this.master.master = false;
     this.master.el.classList.remove(css.master);
@@ -76,6 +78,12 @@ Team.prototype.setMaster = function(player) {
   this.master = player;
   this.master.el.classList.add(css.master);
   this.master.master = true;
+
+  this.turn = true;
+};
+
+Team.prototype.endTurn = function() {
+  this.turn = false;
 };
 
 Team.prototype.setFormation = function(formation) {
@@ -109,6 +117,7 @@ Team.prototype.update = function() {
   this.closestToBall = this.getPlayerClosestToBall(this.ball.owner || this.ball.kicker);
   this.closestToBallPrediction = this.getPlayerClosestToBallPrediction(this.ball.owner || this.ball.kicker);
   this.players.forEach(player => player.update());
+  this.endTurn();
 };
 
 Team.prototype.render = function(dt, alpha) {

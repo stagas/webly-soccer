@@ -283,7 +283,7 @@ Ball.prototype.updateShot = function() {
 
     var angleDiff = math.angleDiff(this.kicker.angle, this.angle);
 
-    if (this.kicker.vel.x || this.kicker.vel.y) {
+    if (this.kicker.vel.x || this.kicker.vel.y || this.shooting === this.shotDuration) {
       var vel = math.angleToPoint(this.kicker.angle);
       if (angleDiff < Math.PI / 5) {
         this.vel.x += vel.x * shotPower * .6;

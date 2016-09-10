@@ -32,6 +32,7 @@ ball.pos.z = ball.px.z = start.z;
 ball.vel.x = -2.28;
 ball.vel.y = 0;
 ball.vel.z = 0;
+ball.update();
 
 /* loop */
 
