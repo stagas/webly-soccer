@@ -243,6 +243,7 @@ Player.prototype.jumpToBall = function() {
   this.jumping = 20;
   this.vel.x = this.velToBall.x * Math.min(50, Math.abs(this.ball.prediction.pos.x - this.pos.x) * .45);
   this.vel.y = this.velToBall.y * Math.min(50, Math.abs(this.ball.prediction.pos.y - this.pos.y) * .45);
+  this.vel.z = 10
   return true;
 };
 

@@ -463,39 +463,36 @@ sprite.player = [
 
 // 20: keeper stretch up right
 `\
-     x
-  xx.o.
- xxxx..
- xxxxx.
-  xxxxt
-   xx.t
+
+    xxx
+   xxxxx
+ .xxxxxxx.
+ txxxxxxxt
+  t.xxx.t
+   t . t
     ttt
     ttt
     ttt
     ppp
     . .
-    t t
-    s s
-    s s\
+   st ts\
 `,
 
 // 21: keeper stretch down right
 
 `\
-
-   s s
-   t t
-   . .
-   ppp
-   ttt
-   ttt
-   txxx
-   xxxxx
-  xx....
-  x.ox.xo
-   t....
-   ttt.t
-   .   .\
+   st ts
+    . .
+    ppp
+    ttt
+    xxx
+   txxxt
+  tx...xt
+ txox.xoxt
+ tt.....tt
+ . tt.tt .
+    ttt
+        \
 `,
 
 
@@ -546,7 +543,7 @@ sprite.player.animation = {
   run_down_left: [[11,true],[12,true],[10,true],[1,true]],
   run_up_left: [[13,true],[14,true],[15,true],[3,true]],
 
-  keeper_jump_up_right: [[19]],
+  keeper_jump_up_right: [[20]],
   keeper_jump_down_right: [[21]],
 };
 
