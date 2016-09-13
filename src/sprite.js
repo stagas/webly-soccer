@@ -420,48 +420,7 @@ sprite.player = [
     s\
 `,
 
-// 18: keeper jump up right
-
-`\
-    xxx
-   xxxxx
-  xxxxx.
-  xxxx.ox
-  .xx.t.
-   t .t
-    ttt
-    ttt
-    ttt
-    ppp
-    . .
-    t .
-    s t
-      s
-     \
-`,
-
-// 19: keeper jump down right
-
-`\
-
-    xxx
-   xxxxx
-  xx....
-  x.ox.xo
-   t...
-    t.t
-    ttt
-    ttt
-    ppp
-    . .
-    . t
-    t s
-    s
-    \
-`,
-
-
-// 20: keeper stretch up right
+// 18: keeper jump up
 `\
 
     xxx
@@ -478,7 +437,7 @@ sprite.player = [
    st ts\
 `,
 
-// 21: keeper stretch down right
+// 19: keeper jump down
 
 `\
    st ts
@@ -495,11 +454,26 @@ sprite.player = [
         \
 `,
 
+// 20: keeper jump right
+
+`\
+
+
+
+       xxx
+      xxxxx
+     xxx...
+     xx..ox .
+      x....t
+s..ptttt.tt
+ss.ptttttttt.
+ s\
+`,
 
 ];
 
 sprite.player.shadow = function makeShadow(art, n) {
-  if (n >= 20) return art;
+  if (n >= 18) return art;
 
   if ('string' === typeof art) art = art.split('\n');
   art = art.slice();
@@ -543,8 +517,10 @@ sprite.player.animation = {
   run_down_left: [[11,true],[12,true],[10,true],[1,true]],
   run_up_left: [[13,true],[14,true],[15,true],[3,true]],
 
-  keeper_jump_up_right: [[20]],
-  keeper_jump_down_right: [[21]],
+  keeper_jump_up: [[18]],
+  keeper_jump_down: [[19]],
+  keeper_jump_right: [[20]],
+  keeper_jump_left: [[20,true]],
 };
 
 sprite.player.palette = {

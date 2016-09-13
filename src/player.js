@@ -510,8 +510,13 @@ Player.prototype.updatePhysics = function() {
 
 Player.prototype.renderFaceAnimation = function() {
   if (this.isJumping() && this.isGoalkeeper()) {
-    if (this.vel.y < 0) this.face = 'keeper_jump_up_right';
-    else this.face = 'keeper_jump_down_right';
+    if (Math.abs(this.vel.x) > Math.abs(this.vel.y)) {
+      if (this.vel.x < 0) this.face = 'keeper_jump_left';
+      else this.face = 'keeper_jump_right';
+    } else {
+      if (this.vel.y < 0) this.face = 'keeper_jump_up';
+      else this.face = 'keeper_jump_down';
+    }
   } else {
     this.faceStandMap['0,0'] = this.faceMap['0,0'] =
     this.faceStandMap[this.velToBall.round()];
