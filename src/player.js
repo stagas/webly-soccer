@@ -22,6 +22,9 @@ function Player(game, data) {
 
   this.el.className = css.player;
 
+  this.shadow = sprite.create('player_shadow');
+  this.shadow.el.className = css['player-shadow'];
+
   this.pos.x = this.px.x = data.pos ? data.pos.x : 300 + Math.random() * 200 | 0;
   this.pos.y = this.px.y = data.pos ? data.pos.y : 200 + Math.random() * 200 | 0;
   this.vel.x = data.vel ? data.vel.x : 0;
@@ -198,9 +201,9 @@ Player.prototype.holdBall = function() {
   this.ball.vel.x = 0;
   this.ball.vel.y = 0;
   this.ball.vel.z = 0;
-  this.ball.pos.x = this.newPos.x + arms.x * 6;
+  this.ball.pos.x = this.newPos.x + arms.x * 9;
   this.ball.pos.y = this.newPos.y + arms.y * 3;
-  this.ball.pos.z = 9 //this.newPos.z + 10;
+  this.ball.pos.z = this.newPos.z > 1 ? this.newPos.z : 9;
   return true;
 };
 
@@ -546,6 +549,12 @@ Player.prototype.renderDraw = function() {
   Object.assign(this.el.style, {
     left: this.px.x + 'px',
     top: (this.px.y - this.px.z) + 'px',
+    backgroundPosition: `-${this.facePos.x}px -${this.facePos.y}px`,
+  });
+
+  Object.assign(this.shadow.el.style, {
+    left: this.px.x + 'px',
+    top: (this.px.y + this.px.z) + 'px',
     backgroundPosition: `-${this.facePos.x}px -${this.facePos.y}px`,
   });
 };

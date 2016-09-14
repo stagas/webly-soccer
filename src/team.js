@@ -28,6 +28,7 @@ Team.prototype.createPlayers = function() {
     });
     this.players.push(player);
     this.el.appendChild(player.el);
+    this.el.appendChild(player.shadow.el);
   }
 };
 

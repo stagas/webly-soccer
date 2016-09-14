@@ -37,9 +37,15 @@ body {
   opacity: 0.87;
 }
 
-.player {
+.player,
+.player-shadow {
   margin-left: -48px;
   margin-top: -39px;
+  z-index: 2;
+}
+.player-shadow {
+  margin-top: -36px;
+  z-index: 1;
 }
 
 .player.master:before {

@@ -460,6 +460,8 @@ sprite.player = [
 
 
 
+
+
        xxx
       xxxxx
      xxx...
@@ -537,6 +539,20 @@ sprite.player.palette = {
 sprite.player.width = 11;
 sprite.player.height = 14;
 sprite.player.scale = sprite.scale;
+
+sprite.player_shadow = sprite.player.map((art, i) => {
+  if (i < 18) return '';
+  else return art.replace(/\S/g, '%'); //.split(/\n/g).reverse();
+});
+sprite.player_shadow.shadow = art => art;
+sprite.player_shadow.animation = sprite.player.animation;
+sprite.player_shadow.width = sprite.player.width;
+sprite.player_shadow.height = sprite.player.height;
+sprite.player_shadow.scale = sprite.player.scale;
+sprite.player_shadow.palette = {
+  '%': 'rgba(0,0,0,0.3)'
+};
+
 
 sprite.center_spot = [`\
 
