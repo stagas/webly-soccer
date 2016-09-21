@@ -36,12 +36,16 @@ function Stadium() {
   this.debugCanvas.height = '1700';
   this.debugCanvas.style.zIndex = 10000;
 
-  // this.el.appendChild(this.debugCanvas);
-  // var ctx = this.debugCanvas.getContext('2d');
-  // ctx.strokeStyle = '#f00';
-  // ctx.rect(246, 785, 303 - 246, 924 - 785);
-  // ctx.rect(2457, 785, 303 - 246, 924 - 785);
-  // ctx.stroke();
+  this.el.appendChild(this.debugCanvas);
+  var ctx = this.debugCanvas.getContext('2d');
+  ctx.strokeStyle = '#f00';
+  ctx.rect(303, 250+303, 315, 600);
+  ctx.stroke();
+
+  this.leftPenaltyArea = [
+    { x: 303, y: 250+303 },
+    { x: 303+315, y: 250+303+600 }
+  ];
 
   this.leftGoalArea = {
     top: [{ x: 246, y: 785 }, { x: 303, y: 785 }],

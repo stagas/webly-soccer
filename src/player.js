@@ -242,12 +242,20 @@ Player.prototype.isJumping = function() {
   return this.pos.z > 0 || this.jumping;
 };
 
+Player.prototype.isBallInArea = function() {
+  return this.ball.prediction.pos.isInside(this.stadium.leftPenaltyArea);
+};
+
 Player.prototype.jumpToBall = function() {
   this.jumping = 20;
-  this.vel.x = this.velToBall.x * Math.min(50, Math.abs(this.ball.prediction.pos.x - this.pos.x) * .45);
-  this.vel.y = this.velToBall.y * Math.min(50, Math.abs(this.ball.prediction.pos.y - this.pos.y) * .45);
+  this.vel.x = this.velToBall.x * Math.min(40, Math.abs(this.ball.prediction.pos.x - this.pos.x) * .45);
+  this.vel.y = this.velToBall.y * Math.min(40, Math.abs(this.ball.prediction.pos.y - this.pos.y) * .45);
   this.vel.z = 10
   return true;
+};
+
+Player.prototype.isBallFast = function() {
+  return Math.abs(this.ball.vel.x) + Math.abs(this.ball.vel.y) > 35;
 };
 
 Player.prototype.waitToDrop = function() {
@@ -276,22 +284,55 @@ Player.prototype.makeBehaviors = function() {
   var p = this;
   var _ = behavior;
 
+  this.maybeDribble =
+    _.sequence([
+      _.not(p.isBallKicker),
+      p.isMaster,
+      p.isBallBelowZ,
+      p.isTouchingBall,
+      p.attractBall,
+      p.makeBallOwner,
+      p.isDribblingBall,
+      p.dribbleBall,
+    ]);
+
   this.goalKeeperWalkWithBall =
     _.sequence([
       p.isTouchingBall,
       p.makeBallOwner,
       p.makeMaster,
-      p.holdBall,
+      _.select([
+        _.sequence([
+          p.isBallInArea,
+          p.holdBall,
+        ]),
+        p.maybeDribble,
+      ]),
       p.controls,
     ]);
 
   this.goalKeeperMaybeJump =
-    _.sequence([
-      _.not(p.isBallOwner),
-      p.isNearBall,
-      _.not(p.isTouchingBall),
-      p.jumpToBall,
-      p.waitToDrop,
+    _.select([
+      _.sequence([
+        _.not(p.isBallOwner),
+        _.not(p.isTouchingBall),
+        p.isNearBall,
+        p.isBallInArea,
+        p.isBallFast,
+        p.jumpToBall,
+        p.waitToDrop,
+      ]),
+      // _.sequence([
+      //   p.isBallOwner,
+      //   p.maybeDribble,
+      //   p.controls,
+      // ]),
+      _.sequence([
+        _.not(p.isBallOwner),
+        _.not(p.isTouchingBall),
+        p.isBallInArea,
+        p.runToBall,
+      ]),
     ]);
 
   this.goalKeeper =
@@ -339,15 +380,25 @@ Player.prototype.makeBehaviors = function() {
           ])),
 
           // p.isTeamOwner,
+          _.not(p.isGoalkeeper),
           p.isVeryNearBall,
           p.stop,
         ]),
 
         _.sequence([
           _.repeat(_.sequence([
-            _.not(p.isInFormation),
-            _.not(p.isNearBall),
-            p.runToFormation,
+            _.select([
+              _.sequence([
+                p.isGoalkeeper,
+                _.not(p.isInFormation),
+                p.runToFormation,
+              ]),
+              _.sequence([
+                _.not(p.isInFormation),
+                _.not(p.isNearBall),
+                p.runToFormation,
+              ]),
+            ]),
           ])),
           p.stop,
         ]),
@@ -375,18 +426,6 @@ Player.prototype.makeBehaviors = function() {
       p.dribbleBall,
     ]);
 
-  this.maybeDribble =
-    _.sequence([
-      _.not(p.isBallKicker),
-      p.isMaster,
-      p.isBallBelowZ,
-      p.isTouchingBall,
-      p.attractBall,
-//      p.makeBallOwner,
-      p.isDribblingBall,
-      p.dribbleBall,
-    ]);
-
   this.runBehaviors =
     _.select([
       p.goalKeeper,
@@ -401,9 +440,6 @@ Player.prototype.makeBehaviors = function() {
 
 Player.prototype.updateBehaviors = function() {
   this.runBehaviors();
-  // this.maybeDribble();
-  // this.maybeRunToBall();
-  // this.maybeControl();
 };
 
 Player.prototype.updateCollisions = function() {
@@ -525,8 +561,6 @@ Player.prototype.renderFaceAnimation = function() {
     this.faceStandMap[this.velToBall.round()];
     this.face = this.faceMap[this.vel.round()];
   }
-
-  // if (this.isKeeper()) this.face = 'keeper_jump_down_right';
 
   var i = this.faceIndex;
   var n = this.faceNeedle;
